@@ -108,7 +108,7 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-inline void XMFLoat3Normalize(DirectX::XMFLOAT3* pOut, const DirectX::XMFLOAT3* pIn)
+inline void XMFloat3Normalize(DirectX::XMFLOAT3* pOut, const DirectX::XMFLOAT3* pIn)
 {
 	auto v = DirectX::XMLoadFloat3(pIn);
 	v = DirectX::XMVector3Normalize(v);
