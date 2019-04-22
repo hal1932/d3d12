@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include <Windows.h>
 
 class CpuStopwatch
 {

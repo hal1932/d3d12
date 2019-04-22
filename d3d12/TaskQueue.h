@@ -3,7 +3,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-#include <vector>
 #include <queue>
 #include <iostream>
 

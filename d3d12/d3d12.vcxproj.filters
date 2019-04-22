@@ -72,6 +72,9 @@
     <ClCompile Include="fbxMesh.cpp">
       <Filter>ソース ファイル\fbx</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandListManager.h">
@@ -171,6 +174,9 @@
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>
     <ClInclude Include="..\d3d12app\Camera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

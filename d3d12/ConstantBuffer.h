@@ -1,7 +1,6 @@
 #pragma once
 #include "ResourceViewHeap.h"
 #include "Resource.h"
-#include <memory>
 
 template<class T>
 class ConstantBuffer

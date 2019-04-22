@@ -1,7 +1,5 @@
 #pragma once
 #include "common.h"
-#include <d3d12.h>
-#include <map>
 
 namespace fbx
 {

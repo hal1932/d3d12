@@ -1,7 +1,5 @@
 #pragma once
-#include <Windows.h>
 #include "WindowEvent.h"
-#include <map>
 #include <functional>
 
 class Window

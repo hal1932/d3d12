@@ -1,10 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
-#include <Windows.h>
-#include <string>
-
-
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;

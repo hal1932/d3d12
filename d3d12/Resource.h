@@ -1,7 +1,5 @@
 #pragma once
 #include "ResourceDesc.h"
-#include <d3d12.h>
-#include <memory>
 
 class Device;
 class CommandList;

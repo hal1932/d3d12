@@ -1,7 +1,6 @@
 #pragma once
 #include "common.h"
 #include "CpuStopwatch.h"
-#include <map>
 #include <cstdio>
 
 class CpuStopwatchBatch
