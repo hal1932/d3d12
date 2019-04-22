@@ -1,27 +1,21 @@
 #include "Texture.h"
 #include "common.h"
 #include "Device.h"
-#include "Resource.h"
-#include <DirectXTex.h>
 
 
-Texture::~Texture()
-{
-	SafeDelete(&pResource_);
-	SafeDelete(&pData_);
-}
+
+Texture::~Texture() {}
 
 HRESULT Texture::LoadFromFile(const std::wstring& filepath)
 {
 	HRESULT result;
 
-	SafeDelete(&pData_);
-	pData_ = new DirectX::TexMetadata();
+	pData_.reset();
+	pData_ = std::make_unique<DirectX::TexMetadata>();
 
 	result = DirectX::GetMetadataFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, *pData_);
 	if (FAILED(result))
 	{
-		SafeDelete(&pData_);
 		return result;
 	}
 
@@ -34,7 +28,7 @@ HRESULT Texture::UpdateResources(Device* pDevice)
 {
 	HRESULT result;
 
-	SafeDelete(&pResource_);
+	pResource_.reset();
 
 	ID3D12Resource* pNativeResource;
 	result = DirectX::CreateTexture(pDevice->NativePtr(), *pData_, &pNativeResource);
@@ -43,7 +37,7 @@ HRESULT Texture::UpdateResources(Device* pDevice)
 		return result;
 	}
 
-	pResource_ = new Resource(pNativeResource, pDevice);
+	pResource_ = std::make_unique<Resource>(pNativeResource, pDevice);
 
 	return result;
 }
@@ -53,13 +47,13 @@ HRESULT Texture::UpdateSubresource(CommandList* pCommandList, CommandQueue* pCom
 	HRESULT result;
 
 	DirectX::ScratchImage image;
-	result = DirectX::LoadFromDDSFile(filepath_.c_str(), DirectX::DDS_FLAGS_NONE, pData_, image);
+	result = DirectX::LoadFromDDSFile(filepath_.c_str(), DirectX::DDS_FLAGS_NONE, pData_.get(), image);
 	if (FAILED(result))
 	{
 		return result;
 	}
 
-	auto data = new D3D12_SUBRESOURCE_DATA[image.GetImageCount()];
+	auto data = std::make_unique<D3D12_SUBRESOURCE_DATA[]>(image.GetImageCount());
 	for (int i = 0; i < image.GetImageCount(); ++i)
 	{
 		auto& pSubImage = image.GetImages()[i];
@@ -68,9 +62,7 @@ HRESULT Texture::UpdateSubresource(CommandList* pCommandList, CommandQueue* pCom
 		data[i].SlicePitch = pSubImage.slicePitch;
 	}
 
-	result = pResource_->UpdateSubresources(data, pCommandList, pCommandQueue, 0, static_cast<int>(image.GetImageCount()));
-
-	SafeDeleteArray(&data);
+	result = pResource_->UpdateSubresources(data.get(), pCommandList, pCommandQueue, 0, static_cast<int>(image.GetImageCount()));
 
 	return result;
 }

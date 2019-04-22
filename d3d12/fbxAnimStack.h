@@ -25,10 +25,7 @@ namespace fbx
 		}
 
 	public:
-		~AnimStack()
-		{
-			SafeDeleteArray(&matrices_);
-		}
+		~AnimStack() {}
 
 		const DirectX::XMMATRIX& Matrix(int frame) { return matrices_[frame]; }
 		int FrameCount() { return stop_ - start_ + 1; }
@@ -58,7 +55,7 @@ namespace fbx
 			stop_ = (int)(stop.Get() / period.Get());
 
 			const auto count = stop_ - start_ + 1;
-			matrices_ = new DirectX::XMMATRIX[count];
+			matrices_ = std::make_unique < DirectX::XMMATRIX[]>(count);
 
 			const auto pNode = pMesh->GetNode();
 			for (auto i = start_; i <= stop_; ++i)
@@ -75,7 +72,7 @@ namespace fbx
 	private:
 		int start_;
 		int stop_;
-		DirectX::XMMATRIX* matrices_ = nullptr;
+		std::unique_ptr<DirectX::XMMATRIX[]> matrices_;
 
 		int current_ = 0;
 	};
