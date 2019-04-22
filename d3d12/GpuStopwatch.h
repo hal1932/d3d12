@@ -4,11 +4,7 @@
 class GpuStopwatch
 {
 public:
-	~GpuStopwatch()
-	{
-		SafeRelease(&pResource_);
-		SafeRelease(&pHeap_);
-	}
+	~GpuStopwatch() {}
 
 	HRESULT Create(ID3D12Device* pDevice, int count)
 	{
@@ -43,7 +39,7 @@ public:
 	void Start(ID3D12CommandQueue* pCommandQueue, ID3D12GraphicsCommandList* pCommandList)
 	{
 		pCommandQueue->GetTimestampFrequency(&frequency_);
-		pCommandList->EndQuery(pHeap_, D3D12_QUERY_TYPE_TIMESTAMP, 0);
+		pCommandList->EndQuery(pHeap_.Get(), D3D12_QUERY_TYPE_TIMESTAMP, 0);
 		pCommandList_ = pCommandList;
 
 		isQueried_ = true;
@@ -55,8 +51,8 @@ public:
 		// このままだとEndQueryが他のコマンドと同時実行されて計測結果がブレる可能性があるけど、
 		// Fenceを挟むにはいったんCommandList::Close()してからQueue::Signal()しなきゃいけないから、
 		// どう実装すれば綺麗にまとまるか悩みどころ
-		pCommandList_->EndQuery(pHeap_, D3D12_QUERY_TYPE_TIMESTAMP, 1);
-		pCommandList_->ResolveQueryData(pHeap_, D3D12_QUERY_TYPE_TIMESTAMP, 0, 2, pResource_, 0);
+		pCommandList_->EndQuery(pHeap_.Get(), D3D12_QUERY_TYPE_TIMESTAMP, 1);
+		pCommandList_->ResolveQueryData(pHeap_.Get(), D3D12_QUERY_TYPE_TIMESTAMP, 0, 2, pResource_.Get(), 0);
 		pCommandList_ = nullptr;
 	}
 
@@ -85,8 +81,8 @@ public:
 private:
 	ID3D12GraphicsCommandList* pCommandList_;
 
-	ID3D12QueryHeap* pHeap_;
-	ID3D12Resource* pResource_;
+	ComPtr<ID3D12QueryHeap> pHeap_;
+	ComPtr<ID3D12Resource> pResource_;
 
 	bool isQueried_ = false;
 

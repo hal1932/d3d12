@@ -55,6 +55,7 @@ namespace fbx
 				}
 			}
 
+			SafeDestroy(&pSceneImporter);
 			return S_OK;
 		}
 

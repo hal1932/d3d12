@@ -46,7 +46,7 @@ private:
 	Device* pDevice_ = nullptr;
 
 	ScreenContextDesc desc_;
-	IDXGISwapChain3* pSwapChain_ = nullptr;
+	ComPtr<IDXGISwapChain3> pSwapChain_;
 	
 	UINT frameIndex_ = 0U;
 };

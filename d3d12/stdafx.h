@@ -15,3 +15,5 @@
 #include <string>
 #include <memory>
 #include <map>
+
+using Microsoft::WRL::ComPtr;

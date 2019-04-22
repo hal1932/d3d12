@@ -44,7 +44,7 @@ HRESULT ResourceViewHeap::CreateHeap(Device* pDevice, const HeapDesc& desc)
 
 void ResourceViewHeap::Reset()
 {
-	SafeRelease(&pDescriptorHeap_);
+	pDescriptorHeap_.Reset();
 	descriptorSize_ = 0U;
 	resourceCount_ = 0U;
 	currentSize_ = 0;

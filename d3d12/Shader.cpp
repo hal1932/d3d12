@@ -10,12 +10,7 @@ namespace
 	DXGI_FORMAT GetElementFormat(const D3D12_SIGNATURE_PARAMETER_DESC& desc);
 }
 
-Shader::~Shader()
-{
-	SafeDelete(&pInputLayout_);
-	SafeRelease(&pBlob_);
-}
-
+Shader::~Shader() {}
 HRESULT Shader::CreateFromSourceFile(const ShaderDesc& desc)
 {
 	HRESULT result;
@@ -59,15 +54,11 @@ HRESULT Shader::CreateFromCompiledFile(const CompiledShaderDesc& desc)
 
 HRESULT Shader::CreateInputLayout()
 {
-	pInputLayout_ = new InputLayout();
-	return pInputLayout_->Create(pBlob_);
+	pInputLayout_ = std::make_unique<InputLayout>();
+	return pInputLayout_->Create(pBlob_.Get());
 }
 
-Shader::InputLayout::~InputLayout()
-{
-	SafeDeleteArray(&pSemanticNames_);
-	SafeDeleteArray(&pElements_);
-}
+Shader::InputLayout::~InputLayout() {}
 
 HRESULT Shader::InputLayout::Create(ID3DBlob* pBlob)
 {
@@ -89,8 +80,8 @@ HRESULT Shader::InputLayout::Create(ID3DBlob* pBlob)
 
 	elementCount_ = shaderDesc.InputParameters;
 
-	pElements_ = new D3D12_INPUT_ELEMENT_DESC[elementCount_];
-	pSemanticNames_ = new std::string[elementCount_];
+	pElements_ = std::make_unique<D3D12_INPUT_ELEMENT_DESC[]>(elementCount_);
+	pSemanticNames_ = std::make_unique<std::string[]>(elementCount_);
 
 	for (UINT i = 0; i < elementCount_; ++i)
 	{

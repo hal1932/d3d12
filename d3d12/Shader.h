@@ -25,10 +25,10 @@ class Shader
 public:
 	~Shader();
 
-	ID3DBlob* NativePtr() { return pBlob_; }
+	ID3DBlob* NativePtr() { return pBlob_.Get(); }
 
 	D3D12_INPUT_LAYOUT_DESC NativeInputLayout() { return pInputLayout_->NativeObj(); }
-	D3D12_SHADER_BYTECODE NativeByteCode() { return CD3DX12_SHADER_BYTECODE(pBlob_); }
+	D3D12_SHADER_BYTECODE NativeByteCode() { return CD3DX12_SHADER_BYTECODE(pBlob_.Get()); }
 
 	HRESULT CreateFromSourceFile(const ShaderDesc& desc);
 	HRESULT CreateFromCompiledFile(const CompiledShaderDesc& desc);
@@ -36,21 +36,21 @@ public:
 	HRESULT CreateInputLayout();
 
 private:
-	ID3DBlob* pBlob_ = nullptr;
+	ComPtr<ID3DBlob> pBlob_;
 
 	class InputLayout
 	{
 	public:
 		~InputLayout();
 
-		D3D12_INPUT_LAYOUT_DESC NativeObj() { return { pElements_, elementCount_ }; }
+		D3D12_INPUT_LAYOUT_DESC NativeObj() { return { pElements_.get(), elementCount_ }; }
 		HRESULT Create(ID3DBlob *pBlob);
 
 	private:
-		D3D12_INPUT_ELEMENT_DESC* pElements_ = nullptr;
+		std::unique_ptr<D3D12_INPUT_ELEMENT_DESC[]> pElements_;
 		UINT elementCount_ = 0U;
-		std::string* pSemanticNames_ = nullptr;
+		std::unique_ptr<std::string[]> pSemanticNames_;
 	};
-	InputLayout* pInputLayout_ = nullptr;
+	std::unique_ptr<InputLayout> pInputLayout_;
 };
 

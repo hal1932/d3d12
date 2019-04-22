@@ -4,11 +4,7 @@
 #include "GpuFence.h"
 #include "CommandList.h"
 
-CommandQueue::~CommandQueue()
-{
-	SafeDelete(&pGpuFence_);
-	SafeRelease(&pCommandQueue_);
-}
+CommandQueue::~CommandQueue() {}
 
 HRESULT CommandQueue::Create(Device* pDevice)
 {
@@ -24,7 +20,7 @@ HRESULT CommandQueue::Create(Device* pDevice)
 		return result;
 	}
 
-	pGpuFence_ = new GpuFence();
+	pGpuFence_ = std::make_unique<GpuFence>();
 
 	result = pGpuFence_->Create(pDevice);
 	if (FAILED(result))

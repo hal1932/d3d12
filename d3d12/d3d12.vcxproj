@@ -117,7 +117,6 @@
     <ClInclude Include="CpuStopwatchBatch.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Device.h" />
-    <ClInclude Include="fbxAnimation.h" />
     <ClInclude Include="fbxAnimStack.h" />
     <ClInclude Include="fbxCommon.h" />
     <ClInclude Include="fbxMaterial.h" />

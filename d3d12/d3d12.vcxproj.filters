@@ -158,9 +158,6 @@
     <ClInclude Include="fbxModel.h">
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="fbxAnimation.h">
-      <Filter>ヘッダー ファイル\fbx</Filter>
-    </ClInclude>
     <ClInclude Include="fbxAnimStack.h">
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>

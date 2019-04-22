@@ -16,8 +16,6 @@
 #include "Graphics.h"
 #include "Model.h"
 
-using Microsoft::WRL::ComPtr;
-
 const int cScreenWidth = 1280;
 const int cScreenHeight = 720;
 const int cBufferCount = 2;
@@ -556,7 +554,22 @@ int MainImpl(int, char**)
 
 int main(int argc, char** argv)
 {
+	/* FBXSDKがグローバルにメモリを確保するので、以下の 8+16+32 bytes はどうやってもリークする
+	{235} normal block at 0x000001CF2E6B3F20, 8 bytes long.
+	 Data: <        > 98 C4 12 DF F6 7F 00 00 
+	{234} normal block at 0x000001CF2E6B41F0, 16 bytes long.
+	 Data: < _j.            > 10 5F 6A 2E CF 01 00 00 00 00 00 00 00 00 00 00 
+	{233} normal block at 0x000001CF2E6A5F10, 32 bytes long.
+	 Data: < Ak.     ?k.    > F0 41 6B 2E CF 01 00 00 20 3F 6B 2E CF 01 00 00
+
+	 更にモデルを読み込むと以下のメモリがリークする
+	 {34493} normal block at 0x0000026FDC195BA0, 3840 bytes long.
+	 Data: <   @            > 00 00 00 40 00 00 00 00 00 00 00 00 00 00 00 00
+	{34492} normal block at 0x0000026FDC1AD000, 24 bytes long.
+	 Data: <    ;    [  o   > 00 00 00 00 3B 00 00 00 A0 5B 19 DC 6F 02 00 00
+	*/
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	return MainImpl(argc, argv);
+	return 0;
 }

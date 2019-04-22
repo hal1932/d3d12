@@ -5,7 +5,6 @@
 GpuFence::~GpuFence()
 {
 	SafeCloseHandle(&fenceEvent_);
-	SafeRelease(&pFence_);
 }
 
 HRESULT GpuFence::Create(Device* pDevice)

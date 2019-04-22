@@ -32,7 +32,6 @@ Resource::Resource(ID3D12Resource* pResource, Device* pDevice)
 
 Resource::~Resource()
 {
-	SafeRelease(&pResource_);
 	pDevice_ = nullptr;
 }
 
@@ -109,7 +108,7 @@ void Resource::Unmap(int subresource)
 
 MappedResource Resource::ScopedMap(int subresource)
 {
-	return MappedResource().Map(pResource_, subresource);
+	return MappedResource().Map(pResource_.Get(), subresource);
 }
 
 D3D12_VERTEX_BUFFER_VIEW Resource::GetVertexBufferView(int stride)

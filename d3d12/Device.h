@@ -5,7 +5,7 @@ class Device
 public:
 	~Device();
 
-	ID3D12Device* NativePtr() { return pDevice_; }
+	ID3D12Device* NativePtr() { return pDevice_.Get(); }
 
 	bool IsDebugEnabled() { return (pDebug_ != nullptr); }
 	void ReportLiveObjects()
@@ -22,7 +22,7 @@ public:
 	void Create();
 
 private:
-	ID3D12Device* pDevice_ = nullptr;
-	ID3D12Debug* pDebug_ = nullptr;
+	ComPtr<ID3D12Device> pDevice_;
+	ComPtr<ID3D12Debug> pDebug_;
 };
 

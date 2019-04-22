@@ -60,7 +60,7 @@ public:
 	Resource(ID3D12Resource* pResource, Device* pDevice);
 	~Resource();
 
-	ID3D12Resource* NativePtr() { return pResource_; }
+	ID3D12Resource* NativePtr() { return pResource_.Get(); }
 
 	HRESULT CreateCommited(Device* pDevice, const ResourceDesc& desc);
 	HRESULT CreateCommited(Device* pDevice, const ResourceDesc& desc, const D3D12_CLEAR_VALUE& clearValue);
@@ -86,7 +86,7 @@ public:
 
 private:
 	Device* pDevice_ = nullptr;
-	ID3D12Resource* pResource_ = nullptr;
+	ComPtr<ID3D12Resource> pResource_;
 	ResourceDesc desc_;
 
 	ResourceViewHeap* pHeap_ = nullptr;

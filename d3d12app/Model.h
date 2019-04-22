@@ -14,10 +14,7 @@ class Model
 public:
 	Model() {}
 
-	~Model()
-	{
-		modelPtr_.reset();
-	}
+	~Model() {}
 
 	int BufferCount() { return 2; }
 
@@ -114,7 +111,5 @@ private:
 	Resource* pTextureSrv_;
 
 	ulonglong shaderHash_;
-
-	CommandList* pCommandList_;
 };
 

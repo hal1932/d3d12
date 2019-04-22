@@ -9,7 +9,7 @@ class CommandQueue
 public:
 	~CommandQueue();
 
-	ID3D12CommandQueue* NativePtr() { return pCommandQueue_; }
+	ID3D12CommandQueue* NativePtr() { return pCommandQueue_.Get(); }
 
 	HRESULT Create(Device* pDevice);
 
@@ -18,7 +18,7 @@ public:
 	HRESULT WaitForExecution();
 
 private:
-	ID3D12CommandQueue* pCommandQueue_ = nullptr;
-	GpuFence* pGpuFence_ = nullptr;
+	ComPtr<ID3D12CommandQueue> pCommandQueue_;
+	std::unique_ptr<GpuFence> pGpuFence_;
 };
 

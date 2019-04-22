@@ -45,7 +45,7 @@ class ResourceViewHeap
 public:
 	~ResourceViewHeap();
 
-	ID3D12DescriptorHeap* NativePtr() { return pDescriptorHeap_; }
+	ID3D12DescriptorHeap* NativePtr() { return pDescriptorHeap_.Get(); }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle(int index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle(int index);
@@ -61,7 +61,7 @@ public:
 private:
 	Device* pDevice_ = nullptr;
 
-	ID3D12DescriptorHeap* pDescriptorHeap_ = nullptr;
+	ComPtr<ID3D12DescriptorHeap> pDescriptorHeap_ = nullptr;
 	UINT descriptorSize_ = 0U;
 	UINT resourceCount_ = 0U;
 	int currentSize_ = 0;

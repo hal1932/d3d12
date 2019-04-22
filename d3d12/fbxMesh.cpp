@@ -212,7 +212,7 @@ void Mesh::UpdateVertexResources_(FbxMesh* pMesh, Device* pDevice)
 					n.y *= denomi;
 					n.z *= denomi;
 
-					XMFLoat3Normalize(&pData[i].Normal, &n);
+					XMFloat3Normalize(&pData[i].Normal, &n);
 				}
 				else
 				{

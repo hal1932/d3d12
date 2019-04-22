@@ -13,9 +13,6 @@ Device::~Device()
 			debugInterface->Release();
 		}
 	}
-
-	SafeRelease(&pDevice_);
-	SafeRelease(&pDebug_);
 }
 
 HRESULT Device::EnableDebugLayer()

@@ -2,15 +2,7 @@
 #include "common.h"
 #include "Device.h"
 
-CommandList::~CommandList()
-{
-	SafeRelease(&pNativeList_);
-
-	for (auto pAllocator : allocatorPtrs_)
-	{
-		SafeRelease(&pAllocator);
-	}
-}
+CommandList::~CommandList() {}
 
 HRESULT CommandList::Create(Device* pDevice, SubmitType type, int bufferCount)
 {
@@ -21,7 +13,7 @@ HRESULT CommandList::Create(Device* pDevice, SubmitType type, int bufferCount)
 	allocatorPtrs_.resize(bufferCount);
 	for (auto i = 0; i < bufferCount; ++i)
 	{
-		ID3D12CommandAllocator* pAllocator;
+		ComPtr<ID3D12CommandAllocator> pAllocator;
 		result = pNativeDevice->CreateCommandAllocator(
 			static_cast<D3D12_COMMAND_LIST_TYPE>(type),
 			IID_PPV_ARGS(&pAllocator));
@@ -30,13 +22,13 @@ HRESULT CommandList::Create(Device* pDevice, SubmitType type, int bufferCount)
 			return result;
 		}
 
-		allocatorPtrs_[i] = pAllocator;
+		allocatorPtrs_[i] = std::move(pAllocator);
 	}
 
 	result = pNativeDevice->CreateCommandList(
 		0,
 		static_cast<D3D12_COMMAND_LIST_TYPE>(type),
-		allocatorPtrs_[currentAllocatorIndex_],
+		allocatorPtrs_[currentAllocatorIndex_].Get(),
 		nullptr,
 		IID_PPV_ARGS(&pNativeList_));
 	if (FAILED(result))
@@ -64,7 +56,7 @@ HRESULT CommandList::Open(ID3D12PipelineState* pPipelineState, bool swapBuffers)
 		return result;
 	}
 
-	result = GraphicsList()->Reset(pAllocator, pPipelineState);
+	result = GraphicsList()->Reset(pAllocator.Get(), pPipelineState);
 	if (FAILED(result))
 	{
 		return result;
