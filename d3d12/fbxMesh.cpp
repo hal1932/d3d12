@@ -26,6 +26,10 @@ Mesh::~Mesh()
 
 	SafeDelete(&pMaterial_);
 
+	for (auto i = 0; i < animStackCount_; ++i)
+	{
+		SafeDelete(&pAnimStacks_[i]);
+	}
 	SafeDeleteArray(&pAnimStacks_);
 }
 
