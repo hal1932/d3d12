@@ -9,40 +9,6 @@ namespace fbx
 	class AnimStack
 	{
 	public:
-		static int Count(FbxImporter* pSceneImporter)
-		{
-			return pSceneImporter->GetAnimStackCount();
-		}
-
-		static AnimStack* Create(FbxMesh* pMesh, FbxScene* pScene, FbxImporter* pSceneImporter, int index)
-		{
-			auto pTakeInfo = pSceneImporter->GetTakeInfo(index);
-			if (pTakeInfo == nullptr)
-			{
-				return nullptr;
-			}
-			return new AnimStack(pMesh, pTakeInfo, pScene->GetGlobalSettings().GetTimeMode());
-		}
-
-	public:
-		~AnimStack() {}
-
-		const DirectX::XMMATRIX& Matrix(int frame) { return matrices_[frame]; }
-		int FrameCount() { return stop_ - start_ + 1; }
-		int StartFrame() { return start_; }
-		int StopFrame() { return stop_; }
-
-		const DirectX::XMMATRIX& NextFrame()
-		{
-			const auto& m = matrices_[current_];
-			if (++current_ >= FrameCount())
-			{
-				current_ = 0;
-			}
-			return m;
-		}
-
-	private:
 		AnimStack(FbxMesh* pMesh, fbxsdk::FbxTakeInfo* pTakeInfo, fbxsdk::FbxTime::EMode mode)
 		{
 			fbxsdk::FbxTime period;
@@ -67,6 +33,23 @@ namespace fbx
 					(float)m.Get(2, 0), (float)m.Get(2, 1), (float)m.Get(2, 2), (float)m.Get(2, 3),
 					(float)m.Get(3, 0), (float)m.Get(3, 1), (float)m.Get(3, 2), (float)m.Get(3, 3));
 			}
+		}
+
+		~AnimStack() {}
+
+		const DirectX::XMMATRIX& Matrix(int frame) { return matrices_[frame]; }
+		int FrameCount() { return stop_ - start_ + 1; }
+		int StartFrame() { return start_; }
+		int StopFrame() { return stop_; }
+
+		const DirectX::XMMATRIX& NextFrame()
+		{
+			const auto& m = matrices_[current_];
+			if (++current_ >= FrameCount())
+			{
+				current_ = 0;
+			}
+			return m;
 		}
 
 	private:

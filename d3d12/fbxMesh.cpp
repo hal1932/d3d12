@@ -108,14 +108,15 @@ Mesh* Mesh::CreateReference()
 
 void Mesh::LoadAnimStacks(FbxMesh* pMesh, FbxScene* pScene, FbxImporter* pSceneImporter)
 {
-	animStackCount_ = AnimStack::Count(pSceneImporter);
+	animStackCount_ = pSceneImporter->GetAnimStackCount();
 
 	SafeDeleteArray(&pAnimStacks_);
 	pAnimStacks_ = new AnimStack*[animStackCount_];
 
 	for (auto i = 0; i < animStackCount_; ++i)
 	{
-		pAnimStacks_[i] = AnimStack::Create(pMesh, pScene, pSceneImporter, i);
+		auto pTakeInfo = pSceneImporter->GetTakeInfo(i);
+		pAnimStacks_[i] = new AnimStack(pMesh, pTakeInfo, pScene->GetGlobalSettings().GetTimeMode());
 	}
 }
 
