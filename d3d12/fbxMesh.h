@@ -50,8 +50,8 @@ namespace fbx
 		Mesh* CreateReference();
 
 		void LoadAnimStacks(FbxMesh* pMesh, FbxScene* pScene, FbxImporter* pSceneImporter);
-		int AnimStackCount() { return animStackCount_; }
-		AnimStack* AnimStackPtr(int index) { return pAnimStacks_[index]; }
+		size_t AnimStackCount() { return pAnimStacks_.size(); }
+		AnimStack* AnimStackPtr(int index) { return pAnimStacks_[index].get(); }
 
 		void SetupBuffers(ResourceViewHeap* pHeap)
 		{
@@ -82,8 +82,7 @@ namespace fbx
 		Material* pMaterial_ = nullptr;
 		Transform initialPose_;
 
-		int animStackCount_;
-		AnimStack** pAnimStacks_ = nullptr;
+		std::vector<std::unique_ptr<AnimStack>> pAnimStacks_;
 
 		ConstantBuffer<TransformBuffer> transformCbv_;
 

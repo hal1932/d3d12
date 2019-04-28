@@ -25,12 +25,6 @@ Mesh::~Mesh()
 	}
 
 	SafeDelete(&pMaterial_);
-
-	for (auto i = 0; i < animStackCount_; ++i)
-	{
-		SafeDelete(&pAnimStacks_[i]);
-	}
-	SafeDeleteArray(&pAnimStacks_);
 }
 
 HRESULT Mesh::UpdateResources(FbxMesh* pMesh, FbxPose* pBindPose, Device* pDevice)
@@ -108,15 +102,13 @@ Mesh* Mesh::CreateReference()
 
 void Mesh::LoadAnimStacks(FbxMesh* pMesh, FbxScene* pScene, FbxImporter* pSceneImporter)
 {
-	animStackCount_ = pSceneImporter->GetAnimStackCount();
+	pAnimStacks_.clear();
 
-	SafeDeleteArray(&pAnimStacks_);
-	pAnimStacks_ = new AnimStack*[animStackCount_];
-
-	for (auto i = 0; i < animStackCount_; ++i)
+	for (auto i = 0; i < pSceneImporter->GetAnimStackCount(); ++i)
 	{
 		auto pTakeInfo = pSceneImporter->GetTakeInfo(i);
-		pAnimStacks_[i] = new AnimStack(pMesh, pTakeInfo, pScene->GetGlobalSettings().GetTimeMode());
+		auto pAnimStack = new AnimStack(pMesh, pTakeInfo, pScene->GetGlobalSettings().GetTimeMode());
+		pAnimStacks_.emplace_back(pAnimStack);
 	}
 }
 
