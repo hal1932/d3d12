@@ -37,6 +37,24 @@ void CommandQueue::Submit(CommandList* pCommandList)
 	pCommandQueue_->ExecuteCommandLists(1, ppCmdLists);
 }
 
+HRESULT CommandQueue::Signal(GpuFence* pGpuFence, UINT64 fenceValue)
+{
+	if (pGpuFence->CompletedValue() < fenceValue)
+	{
+		return pCommandQueue_->Signal(pGpuFence->NativePtr(), fenceValue);
+	}
+	return S_OK;
+}
+
+HRESULT CommandQueue::Wait(GpuFence* pGpuFence, UINT64 fenceValue)
+{
+	if (pGpuFence->CompletedValue() < fenceValue)
+	{
+		return pCommandQueue_->Wait(pGpuFence->NativePtr(), fenceValue);
+	}
+	return S_OK;
+}
+
 HRESULT CommandQueue::WaitForExecution()
 {
 	HRESULT result;

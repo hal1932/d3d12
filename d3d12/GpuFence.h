@@ -9,6 +9,7 @@ public:
 
 	ID3D12Fence* NativePtr() { return pFence_.Get(); }
 	UINT64 CurrentValue() { return fenceValue_; }
+	UINT64 CompletedValue() { return pFence_->GetCompletedValue(); }
 
 	HRESULT Create(Device* pDevice);
 	void IncrementValue(){ ++fenceValue_; }

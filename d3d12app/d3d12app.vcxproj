@@ -53,6 +53,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\yuta\Documents\GitHub\DirectXTex\DirectXTex\Bin\Desktop_2017_Win10\$(PlatformTarget)\$(Configuration);C:\Program Files\Autodesk\FBX\FBX SDK\2019.2\lib\vs2017\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -69,6 +70,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\Users\yuta\Documents\GitHub\DirectXTex\DirectXTex\Bin\Desktop_2017_Win10\$(PlatformTarget)\$(Configuration);C:\Program Files\Autodesk\FBX\FBX SDK\2019.2\lib\vs2017\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

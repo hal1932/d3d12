@@ -28,7 +28,7 @@ HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
 	{
 		auto pMaterial = pNode->GetMaterial(i);
 
-		std::cout << pMaterial->GetName() << " " << pMaterial->GetClassId().GetName() << std::endl;
+		//std::cout << pMaterial->GetName() << " " << pMaterial->GetClassId().GetName() << std::endl;
 
 		name_ = pMaterial->GetName();
 
@@ -36,18 +36,18 @@ HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
 		if (pMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId))
 		{
 			auto pLambert = static_cast<FbxSurfaceLambert*>(pMaterial);
-			for (int j = 0; j < 3; ++j)
-			{
-				std::cout << pLambert->Diffuse.Get()[j] << " ";
-			}
-			std::cout << std::endl;
+			//for (int j = 0; j < 3; ++j)
+			//{
+			//	std::cout << pLambert->Diffuse.Get()[j] << " ";
+			//}
+			//std::cout << std::endl;
 		}
 
 		// テクスチャ
 		for (int j = 0; j < pMaterial->GetSrcObjectCount<FbxSurfaceMaterial>(); ++j)
 		{
 			auto pSurfaceMaterial = pMaterial->GetSrcObject<FbxSurfaceMaterial>(j);
-			std::cout << pSurfaceMaterial->GetName() << std::endl;
+			//std::cout << pSurfaceMaterial->GetName() << std::endl;
 		}
 
 		int layerIndex;
@@ -60,7 +60,7 @@ HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
 				auto pTexture = prop.GetSrcObject<FbxFileTexture>(j);
 				if (pTexture)
 				{
-					std::cout << pTexture->GetName() << " " << prop.GetName() << " " << pTexture->GetFileName() << std::endl;
+					//std::cout << pTexture->GetName() << " " << prop.GetName() << " " << pTexture->GetFileName() << std::endl;
 
 					wchar_t path[256];
 					size_t n;

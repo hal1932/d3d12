@@ -41,6 +41,14 @@ HRESULT Model::LoadFromFile(const char* filepath)
 
 	SafeDestroy(&pScene_);
 	pScene_ = FbxScene::Create(GetManager(), "");
+	if (pScene_ == nullptr)
+	{
+		auto error = pSceneImporter->GetStatus().GetErrorString();
+		std::cerr << error << std::endl;
+
+		SafeDestroy(&pSceneImporter);
+		return S_FALSE;
+	}
 
 	result = pSceneImporter->Import(pScene_);
 	if (!result)
@@ -101,7 +109,7 @@ HRESULT Model::UpdateResourcesRec_(FbxNode* pNode, Device* pDevice)
 		return S_FALSE;
 	}
 
-	std::cout << pNode->GetName() << " " << pNode->GetTypeName() << std::endl;
+	//std::cout << pNode->GetName() << " " << pNode->GetTypeName() << std::endl;
 
 	auto pAttribute = pNode->GetNodeAttribute();
 	if (pAttribute)

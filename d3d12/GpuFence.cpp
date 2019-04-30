@@ -26,6 +26,7 @@ HRESULT GpuFence::Create(Device* pDevice)
 	return result;
 }
 
+
 HRESULT GpuFence::WaitForCompletion()
 {
 	auto result = S_OK;

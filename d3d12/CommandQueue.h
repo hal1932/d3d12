@@ -1,4 +1,5 @@
 #pragma once
+#include "GpuFence.h"
 
 class Device;
 class GpuFence;
@@ -14,6 +15,16 @@ public:
 	HRESULT Create(Device* pDevice);
 
 	void Submit(CommandList* pCommandList);
+
+	HRESULT Signal(GpuFence* pGpuFence) {
+		return Signal(pGpuFence, pGpuFence->CurrentValue());
+	}
+	HRESULT Signal(GpuFence* pGpuFence, UINT64 fenceValue);
+	
+	HRESULT Wait(GpuFence* pGpuFence) {
+		return Wait(pGpuFence, pGpuFence->CurrentValue());
+	}
+	HRESULT Wait(GpuFence* pGpuFence, UINT64 fenceValue);
 
 	HRESULT WaitForExecution();
 
