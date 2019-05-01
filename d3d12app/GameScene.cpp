@@ -13,12 +13,12 @@ void GameScene::Setup(Graphics& g)
 	auto pDevice = g.DevicePtr();
 	auto pNativeDevice = pDevice->NativePtr();
 
-	auto& commandListPtrs = commandLists_.CreateCommandLists("main", 0);
-	commandLists_.CreateCommandLists("model_bundles", -1);
+	auto& mainCommandLists = commandLists_.CreateGroup("main", 0);
+	commandLists_.CreateGroup("model_bundles", -1);
 	commandLists_.CommitExecutionOrders();
 
 	auto pCommandList = g.CreateCommandList(CommandList::SubmitType::Direct, 1);
-	commandListPtrs.push_back(pCommandList);
+	mainCommandLists.push_back(pCommandList);
 
 	auto meshCount = 0;
 	for (auto& pModel : modelPtrs_)
@@ -108,7 +108,7 @@ void GameScene::Setup(Graphics& g)
 
 void GameScene::CreateModelCommand(Graphics& g)
 {
-	auto& lists = commandLists_.GetCommandList("model_bundles");
+	auto& modelCommandLists = commandLists_.GetGroup("model_bundles");
 	auto& models = modelPtrs_;
 
 	const auto threadCount = taskQueue_.ThreadCount();
@@ -126,7 +126,7 @@ void GameScene::CreateModelCommand(Graphics& g)
 		const auto end = start + count;
 
 		auto pList = g.CreateCommandList(CommandList::SubmitType::Bundle, 1);
-		lists.push_back(pList);
+		modelCommandLists.push_back(pList);
 
 		pList->Open(nullptr);
 
@@ -226,7 +226,7 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 	}
 	cpuTimer_.Stop(201);
 
-	auto pGraphicsList = commandLists_.GetCommandList("main")[0];
+	auto pGraphicsList = commandLists_.GetGroup("main")[0];
 	pGraphicsList->Open(nullptr);
 
 	auto pNativeGraphicsList = pGraphicsList->GraphicsList();
@@ -306,7 +306,7 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 
 	cpuTimer_.Start(240, "models-draw");
 	{
-		for (auto pBundle : commandLists_.GetCommandList("model_bundles"))
+		for (auto pBundle : commandLists_.GetGroup("model_bundles"))
 		{
 			pNativeGraphicsList->ExecuteBundle(pBundle->GraphicsList());
 		}

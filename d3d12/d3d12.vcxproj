@@ -85,7 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommandList.cpp" />
-    <ClCompile Include="CommandListManager.cpp" />
+    <ClCompile Include="CommandListQueue.cpp" />
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="fbxCommon.cpp" />
@@ -111,7 +111,7 @@
   <ItemGroup>
     <ClInclude Include="..\d3d12app\Camera.h" />
     <ClInclude Include="CommandList.h" />
-    <ClInclude Include="CommandListManager.h" />
+    <ClInclude Include="CommandListQueue.h" />
     <ClInclude Include="CommandQueue.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="ConstantBufferView.h" />

@@ -34,7 +34,7 @@ private:
 	D3D12_VIEWPORT viewport_;
 	D3D12_RECT scissorRect_;
 
-	CommandListManager commandLists_;
+	CommandListQueue commandLists_;
 	TaskQueue taskQueue_;
 
 	CpuStopwatchBatch cpuTimer_;

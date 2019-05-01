@@ -1,9 +1,9 @@
-#include "CommandListManager.h"
+#include "CommandListQueue.h"
 #include "CommandList.h"
 #include "CommandQueue.h"
 #include <ctime>
 
-CommandListManager::~CommandListManager()
+CommandListQueue::~CommandListQueue()
 {
 	for (auto& lists : commandLists_)
 	{
@@ -14,7 +14,7 @@ CommandListManager::~CommandListManager()
 	}
 }
 
-std::vector<CommandList*>& CommandListManager::CreateCommandLists(const tstring& name, int executionOrder)
+std::vector<CommandList*>& CommandListQueue::CreateGroup(const tstring& name, int executionOrder)
 {
 	int hash;
 
@@ -43,7 +43,7 @@ std::vector<CommandList*>& CommandListManager::CreateCommandLists(const tstring&
 	return commandLists_[hash];
 }
 
-void CommandListManager::CommitExecutionOrders()
+void CommandListQueue::CommitExecutionOrders()
 {
 	sortedListPtrs_.clear();
 
@@ -60,7 +60,7 @@ void CommandListManager::CommitExecutionOrders()
 	}
 }
 
-std::vector<CommandList*>& CommandListManager::GetCommandList(const tstring& name)
+std::vector<CommandList*>& CommandListQueue::GetGroup(const tstring& name)
 {
 	const auto hashIter = hashes_.find(name);
 	if (hashIter == hashes_.end())
@@ -71,7 +71,7 @@ std::vector<CommandList*>& CommandListManager::GetCommandList(const tstring& nam
 	return commandLists_[hashIter->second];
 }
 
-bool CommandListManager::SetExecutionOrder(int order, const tstring& name)
+bool CommandListQueue::SetExecutionOrder(int order, const tstring& name)
 {
 	const auto hashIter = hashes_.find(name);
 	if (hashIter == hashes_.end())
@@ -83,12 +83,12 @@ bool CommandListManager::SetExecutionOrder(int order, const tstring& name)
 	return true;
 }
 
-void CommandListManager::ClearExecutionOrder(const tstring& name)
+void CommandListQueue::ClearExecutionOrder(const tstring& name)
 {
 	SetExecutionOrder(-1, name);
 }
 
-void CommandListManager::Execute(CommandQueue* pQueue)
+void CommandListQueue::Execute(CommandQueue* pQueue)
 {
 	auto pNativeQueue = pQueue->NativePtr();
 

@@ -6,15 +6,16 @@
 class CommandList;
 class CommandQueue;
 
-class CommandListManager
+
+class CommandListQueue
 {
 public:
-	~CommandListManager();
+	~CommandListQueue();
 
-	std::vector<CommandList*>& CreateCommandLists(const tstring& name, int executionOrder);
+	std::vector<CommandList*>& CreateGroup(const tstring& name, int executionOrder);
 	void CommitExecutionOrders();
 
-	std::vector<CommandList*>& GetCommandList(const tstring& name);
+	std::vector<CommandList*>& GetGroup(const tstring& name);
 
 	bool SetExecutionOrder(int order, const tstring& name);
 	void ClearExecutionOrder(const tstring& name);
