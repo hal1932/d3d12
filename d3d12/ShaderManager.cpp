@@ -36,7 +36,7 @@ ulonglong ShaderManager::LoadFromModelMaterial(fbx::Model* pModel)
 	{
 		auto pVertexShader = new Shader();
 		auto path = tstring_to_wcs("assets/" + name + "VS.hlsl");
-		pVertexShader->CreateFromSourceFile({ path, _T("VSFunc"), _T("vs_5_0") });
+		pVertexShader->CreateFromSourceFile({ ShaderType::Vertex, path, _T("VSFunc"), _T("vs_5_0") });
 		SafeDeleteArray(&path);
 
 		pVertexShader->CreateInputLayout();
@@ -54,7 +54,7 @@ ulonglong ShaderManager::LoadFromModelMaterial(fbx::Model* pModel)
 	{
 		auto pPixelShader = new Shader();
 		auto path = tstring_to_wcs("assets/" + name + "PS.hlsl");
-		pPixelShader->CreateFromSourceFile({ path, _T("PSFunc"), _T("ps_5_0") });
+		pPixelShader->CreateFromSourceFile({ ShaderType::Pixel, path, _T("PSFunc"), _T("ps_5_0") });
 		SafeDeleteArray(&path);
 
 		pixelShaders_[name] = pPixelShader;
@@ -76,12 +76,22 @@ const D3D12_INPUT_LAYOUT_DESC ShaderManager::InputLayout(const tstring& name)
 	return vertexShaders_[name]->NativeInputLayout();
 }
 
-const D3D12_SHADER_BYTECODE ShaderManager::VertexShader(const tstring& name)
+Shader* ShaderManager::VertexShader(const tstring& name)
 {
-	return vertexShaders_[name]->NativeByteCode();
+	return vertexShaders_[name];
 }
 
-const D3D12_SHADER_BYTECODE ShaderManager::PixelShader(const tstring& name)
+const D3D12_SHADER_BYTECODE ShaderManager::VertexShaderBytecode(const tstring& name)
 {
-	return pixelShaders_[name]->NativeByteCode();
+	return VertexShader(name)->NativeByteCode();
+}
+
+Shader* ShaderManager::PixelShader(const tstring& name)
+{
+	return pixelShaders_[name];
+}
+
+const D3D12_SHADER_BYTECODE ShaderManager::PixelShaderBytecode(const tstring& name)
+{
+	return PixelShader(name)->NativeByteCode();
 }

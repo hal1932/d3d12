@@ -55,48 +55,6 @@ void GameScene::Setup(Graphics& g)
 	//}
 
 	{
-		CD3DX12_DESCRIPTOR_RANGE1 ranges[3];
-		ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-		ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-		ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-
-		CD3DX12_ROOT_PARAMETER1 params[3];
-		params[0].InitAsDescriptorTable(1, &ranges[0], D3D12_SHADER_VISIBILITY_VERTEX);
-		params[1].InitAsDescriptorTable(1, &ranges[1], D3D12_SHADER_VISIBILITY_VERTEX);
-		params[2].InitAsDescriptorTable(1, &ranges[2], D3D12_SHADER_VISIBILITY_PIXEL);
-
-		CD3DX12_STATIC_SAMPLER_DESC sampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
-		sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC desc;
-		desc.Init_1_1(
-			_countof(params), params,
-			1, &sampler,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
-		);
-
-		ComPtr<ID3DBlob> pSignature;
-		ComPtr<ID3DBlob> pError;
-
-		ThrowIfFailed(
-			D3DX12SerializeVersionedRootSignature(
-				&desc,
-				D3D_ROOT_SIGNATURE_VERSION_1,
-				&pSignature,
-				&pError));
-
-		ThrowIfFailed(
-			pNativeDevice->CreateRootSignature(
-				0,
-				pSignature->GetBufferPointer(),
-				pSignature->GetBufferSize(),
-				IID_PPV_ARGS(&pRootSignature_)));
-	}
-
-	{
 		for (auto& pModel : modelPtrs_)
 		{
 			shaders_.LoadFromModelMaterial(&pModel->FbxModel());
@@ -111,7 +69,6 @@ void GameScene::Setup(Graphics& g)
 		CD3DX12_BLEND_DESC descBS(D3D12_DEFAULT);
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
-		desc.pRootSignature = pRootSignature_.Get();
 		desc.RasterizerState = descRS;
 		desc.BlendState = descBS;
 		desc.DepthStencilState.DepthEnable = TRUE;
@@ -127,9 +84,16 @@ void GameScene::Setup(Graphics& g)
 
 		for (const auto& name : { "Simple2" })
 		{
+			CD3DX12_STATIC_SAMPLER_DESC sampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+			sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+			RootSignatureDesc rootSigDesc(shaders_.VertexShader(name), shaders_.PixelShader(name));
+			rootSignature_.Create(pDevice, rootSigDesc, 1, &sampler);
+
+			desc.pRootSignature = rootSignature_.NativePtr();
 			desc.InputLayout = shaders_.InputLayout(name);
-			desc.VS = shaders_.VertexShader(name);
-			desc.PS = shaders_.PixelShader(name);
+			desc.VS = shaders_.VertexShaderBytecode(name);
+			desc.PS = shaders_.PixelShaderBytecode(name);
 
 			ComPtr<ID3D12PipelineState> pPso;
 			ThrowIfFailed(pNativeDevice->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pPso)));
@@ -169,7 +133,7 @@ void GameScene::CreateModelCommand(Graphics& g)
 
 		auto pHeap = cbSrUavHeap_.NativePtr();
 		pNativeList->SetDescriptorHeaps(1, &pHeap);
-		pNativeList->SetGraphicsRootSignature(pRootSignature_.Get());
+		pNativeList->SetGraphicsRootSignature(rootSignature_.NativePtr());
 		pNativeList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		ulonglong lastShader = 0ULL;
@@ -338,10 +302,7 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 	{
 		for (auto pBundle : commandLists_.GetCommandList("model_bundles"))
 		{
-			//taskQueue.Enqueue([pNativeGraphicsList, pBundle]()
-			//{
 			pNativeGraphicsList->ExecuteBundle(pBundle->GraphicsList());
-			//});
 		}
 	}
 	cpuTimer_.Stop(240);

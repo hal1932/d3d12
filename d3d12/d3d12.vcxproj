@@ -93,8 +93,10 @@
     <ClCompile Include="fbxMesh.cpp" />
     <ClCompile Include="fbxModel.cpp" />
     <ClCompile Include="GpuFence.cpp" />
+    <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceViewHeap.cpp" />
+    <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="ScreenContext.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
@@ -125,11 +127,13 @@
     <ClInclude Include="FrameCounter.h" />
     <ClInclude Include="GpuFence.h" />
     <ClInclude Include="GpuStopwatch.h" />
+    <ClInclude Include="InputLayout.h" />
     <ClInclude Include="lib.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceDesc.h" />
     <ClInclude Include="ResourceViewHeap.h" />
+    <ClInclude Include="RootSignature.h" />
     <ClInclude Include="ScreenContext.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />

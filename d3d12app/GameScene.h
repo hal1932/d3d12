@@ -15,10 +15,11 @@ public:
 
 	void Setup(Graphics& g);
 	void Calc();
-	void Draw(Graphics& g, GpuStopwatch* pStopWatch);
+	void Draw(Graphics& g, GpuStopwatch* pStopwatch);
 
 private:
-	ComPtr<ID3D12RootSignature> pRootSignature_;
+	//ComPtr<ID3D12RootSignature> pRootSignature_;
+	RootSignature rootSignature_;
 
 	std::array<std::unique_ptr<Model>, cModelGridSize * cModelGridSize * cModelGridSize> modelPtrs_;
 	std::map<tstring, ComPtr<ID3D12PipelineState>> pPipelineStates_;
