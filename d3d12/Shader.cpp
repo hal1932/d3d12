@@ -23,7 +23,7 @@ HRESULT Shader::CreateFromSourceFile(const ShaderDesc& desc)
 	flags |= D3DCOMPILE_DEBUG;
 #endif
 
-	ComPtr<ID3DBlob> error;
+	ComPtr<ID3DBlob> pError;
 	result = D3DCompileFromFile(
 		desc.FilePath,
 		nullptr, // D3D_SHADER_MACRO* pDefines
@@ -33,9 +33,11 @@ HRESULT Shader::CreateFromSourceFile(const ShaderDesc& desc)
 		flags,
 		0,
 		&pBlob_,
-		&error);
+		&pError);
 	if (FAILED(result))
 	{
+		auto message = reinterpret_cast<char*>(pError->GetBufferPointer());
+		OutputDebugStringA(message);
 		return result;
 	}
 

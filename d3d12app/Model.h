@@ -3,7 +3,7 @@
 #include <memory>
 
 __declspec(align(256))
-struct CameraBuffer
+struct CameraConstant
 {
 	DirectX::XMMATRIX View;
 	DirectX::XMMATRIX Proj;
@@ -47,8 +47,6 @@ public:
 			modelPtr_->MeshPtr(i)->SetupBuffers(pHeap);
 		}
 
-		cameraCbv_.Setup(pHeap);
-
 		if (modelPtr_->MeshPtr(0)->MaterialPtr()->TexturePtr() != nullptr)
 		{
 			const SrvDesc srvDesc = {
@@ -68,21 +66,18 @@ public:
 		modelPtr_->SetShaderHash(hash);
 	}
 
-	void SetTransform(const DirectX::XMMATRIX& world, const CameraBuffer& camera)
+	void SetTransform(const DirectX::XMMATRIX& world)
 	{
 		for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
 		{
 			auto m = modelPtr_->MeshPtr(i)->AnimStackPtr(0)->NextFrame() * world;
 			modelPtr_->MeshPtr(i)->SetTransform(m);
 		}
-
-		cameraCbv_.SetBuffer(camera);
 	}
 
-	void CreateDrawCommand(ID3D12GraphicsCommandList* pNativeList)
+	void CreateDrawCommand(ID3D12GraphicsCommandList* pNativeList, ConstantBufferView<CameraConstant>* pCameraCb)
 	{
-		pNativeList->SetGraphicsRootDescriptorTable(1, cameraCbv_.GpuDescriptorHandle());
-
+		pNativeList->SetGraphicsRootDescriptorTable(1, pCameraCb->GpuDescriptorHandle());
 		if (pTextureSrv_ != nullptr)
 		{
 			pNativeList->SetGraphicsRootDescriptorTable(2, pTextureSrv_->GpuDescriptorHandle());
@@ -107,7 +102,6 @@ public:
 private:
 	std::unique_ptr<fbx::Model> modelPtr_;
 
-	ConstantBuffer<CameraBuffer> cameraCbv_;
 	Resource* pTextureSrv_;
 
 	ulonglong shaderHash_;

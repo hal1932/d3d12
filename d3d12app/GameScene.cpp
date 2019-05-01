@@ -35,6 +35,7 @@ void GameScene::Setup(Graphics& g)
 	{
 		pModel->SetupBuffers(&cbSrUavHeap_);
 	}
+	cameraCbv_.Setup(&cbSrUavHeap_);
 
 	//for (auto i = 0; i < cModelGridSize; ++i)
 	//{
@@ -147,7 +148,7 @@ void GameScene::CreateModelCommand(Graphics& g)
 				pNativeList->SetPipelineState(pPipelineStates_[name].Get());
 				lastShader = shader;
 			}
-			pModel->CreateDrawCommand(pNativeList);
+			pModel->CreateDrawCommand(pNativeList, &cameraCbv_);
 		}
 
 		pList->Close();
@@ -155,7 +156,7 @@ void GameScene::CreateModelCommand(Graphics& g)
 }
 
 
-void GameScene::Calc()
+void GameScene::Calc(Graphics& g)
 {
 	cpuTimer_.Start(100, "calc");
 
@@ -188,6 +189,21 @@ void GameScene::Calc()
 		});
 	}
 
+	{
+		auto& c = camera_;
+
+		c.SetPosition({ 10.0f, 5.0f, -10.0f + std::sinf(static_cast<float>(frameIndex_) / 10.0f) * 10.0f });
+		c.SetFocus({ 0.0f, 0.0f, 0.0f });
+		c.SetUp({ 0.0f, 1.0f, 0.0f });
+
+		c.SetFovY(DirectX::XM_PIDIV4);
+		c.SetAspect(g.ScreenPtr()->AspectRatio());
+		c.SetNearPlane(0.1f);
+		c.SetFarPlane(1000.0f);
+
+		c.UpdateMatrix();
+	}
+
 	++frameIndex_;
 
 	cpuTimer_.Stop(100);
@@ -202,22 +218,11 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 	{
 		auto& c = camera_;
 
-		c.SetPosition({ 10.0f, 5.0f, -10.0f });
-		c.SetFocus({ 0.0f, 0.0f, 0.0f });
-		c.SetUp({ 0.0f, 1.0f, 0.0f });
+		CameraConstant cb;
+		cb.View = c.View();
+		cb.Proj = c.Proj();
 
-		c.SetFovY(DirectX::XM_PIDIV4);
-		c.SetAspect(g.ScreenPtr()->AspectRatio());
-		c.SetNearPlane(0.1f);
-		c.SetFarPlane(1000.0f);
-
-		c.UpdateMatrix();
-
-		for (auto i = 0; i < taskQueue_.ThreadCount(); ++i)
-		{
-			cameraBuffers_[i].View = c.View();
-			cameraBuffers_[i].Proj = c.Proj();
-		}
+		cameraCbv_.CopyBufferFrom(cb);
 	}
 	cpuTimer_.Stop(201);
 
@@ -287,11 +292,12 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 
 			taskQueue_.Enqueue([i, start, end, this]()
 			{
+				fbx::TransformConstant cb;
 				for (auto j = start; j < end; ++j)
 				{
 					auto& pModel = modelPtrs_[j];
-					modelTransformBuffers_[i].World = pModel->TransformPtr()->Matrix();
-					pModel->SetTransform(modelTransformBuffers_[i].World, cameraBuffers_[i]);
+					cb.World = pModel->TransformPtr()->Matrix();
+					pModel->SetTransform(cb.World);
 				}
 			});
 		}

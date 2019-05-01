@@ -6,6 +6,14 @@ public:
 	const DirectX::XMMATRIX& View() { return view_; }
 	const DirectX::XMMATRIX& Proj() { return proj_; }
 
+	const DirectX::XMVECTOR& Position() { return position_; }
+	const DirectX::XMVECTOR& Focus() { return focus_; }
+	const DirectX::XMVECTOR& Up() { return up_; }
+	float FovY() { return fovY_; }
+	float Aspect() { return fovY_; }
+	float NearZ() { return near_; }
+	float FarZ() { return far_; }
+
 	void SetPosition(DirectX::FXMVECTOR position) { position_ = position; }
 	void SetFocus(DirectX::FXMVECTOR focus) { focus_ = focus; }
 	void SetUp(DirectX::FXMVECTOR up) { up_ = up; }

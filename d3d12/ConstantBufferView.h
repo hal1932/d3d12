@@ -3,10 +3,10 @@
 #include "Resource.h"
 
 template<class T>
-class ConstantBuffer
+class ConstantBufferView
 {
 public:
-	~ConstantBuffer()
+	~ConstantBufferView()
 	{
 		if (buffer_ != nullptr)
 		{
@@ -21,7 +21,7 @@ public:
 		buffer_ = resourcePtr_->Map(0);
 	}
 
-	void SetBuffer(const T& data)
+	void CopyBufferFrom(const T& data)
 	{
 		memcpy(buffer_, &data, sizeof(T));
 	}

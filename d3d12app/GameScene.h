@@ -14,11 +14,10 @@ public:
 	~GameScene();
 
 	void Setup(Graphics& g);
-	void Calc();
+	void Calc(Graphics& g);
 	void Draw(Graphics& g, GpuStopwatch* pStopwatch);
 
 private:
-	//ComPtr<ID3D12RootSignature> pRootSignature_;
 	RootSignature rootSignature_;
 
 	std::array<std::unique_ptr<Model>, cModelGridSize * cModelGridSize * cModelGridSize> modelPtrs_;
@@ -26,8 +25,8 @@ private:
 
 	ResourceViewHeap cbSrUavHeap_;
 
-	TransformBuffer modelTransformBuffers_[cThreadCount];
-	CameraBuffer cameraBuffers_[cThreadCount];
+	CameraConstant cameraConstant_;
+	ConstantBufferView<CameraConstant> cameraCbv_;
 
 	Camera camera_;
 	ShaderManager shaders_;

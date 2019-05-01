@@ -67,7 +67,7 @@ int MainImpl(int, char**)
 	{
 		counter.CpuWatchPtr()->Start();
 
-		pScene->Calc();
+		pScene->Calc(graphics);
 		pScene->Draw(graphics, counter.GpuWatchPtr());
 
 		counter.CpuWatchPtr()->Stop();

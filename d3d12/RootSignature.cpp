@@ -151,7 +151,7 @@ HRESULT RootSignature::Create(Device* pDevice, const RootSignatureDesc& desc, UI
 
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rawDesc;
 	rawDesc.Init_1_1(
-		params.size(), &params[0],
+		static_cast<UINT>(params.size()), &params[0],
 		staticSamplerCount, staticSamplers,
 		flags
 	);
@@ -166,6 +166,8 @@ HRESULT RootSignature::Create(Device* pDevice, const RootSignatureDesc& desc, UI
 			&pError);
 	if (FAILED(result))
 	{
+		auto message = reinterpret_cast<char*>(pError->GetBufferPointer());
+		OutputDebugStringA(message);
 		return result;
 	}
 

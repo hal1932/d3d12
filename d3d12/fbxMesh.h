@@ -1,15 +1,9 @@
 #pragma once
 #include "fbxsdk.h"
 #include "Transform.h"
-#include "ConstantBuffer.h"
+#include "ConstantBufferView.h"
 #include <DirectXMath.h>
 #include <Windows.h>
-
-__declspec(align(256))
-struct TransformBuffer
-{
-	DirectX::XMMATRIX World;
-};
 
 class Device;
 class Resource;
@@ -20,6 +14,12 @@ namespace fbx
 {
 	class Material;
 	class AnimStack;
+
+	__declspec(align(256))
+	struct TransformConstant
+	{
+		DirectX::XMMATRIX World;
+	};
 
 	class Mesh
 	{
@@ -60,9 +60,9 @@ namespace fbx
 
 		void SetTransform(const DirectX::XMMATRIX& t)
 		{
-			TransformBuffer buffer;
-			buffer.World = initialPose_.Matrix() * t;
-			transformCbv_.SetBuffer(buffer);
+			TransformConstant cb;
+			cb.World = initialPose_.Matrix() * t;
+			transformCbv_.CopyBufferFrom(cb);
 		}
 
 		void SetRootDescriptorTable(ID3D12GraphicsCommandList* pList, int index)
@@ -84,7 +84,7 @@ namespace fbx
 
 		std::vector<std::unique_ptr<AnimStack>> pAnimStacks_;
 
-		ConstantBuffer<TransformBuffer> transformCbv_;
+		ConstantBufferView<TransformConstant> transformCbv_;
 
 		void Setup_();
 		void UpdateVertexResources_(FbxMesh* pMesh, Device* pDevice);
