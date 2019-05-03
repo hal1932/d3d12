@@ -6,7 +6,7 @@
 #include <set>
 #include <numeric>
 
-class ModelPass final
+class ModelPass final : public RenderPass
 {
 public:
 	~ModelPass() {}
@@ -15,6 +15,11 @@ public:
 	{
 		pModels_ = pModels;
 		pModelResourceViewHeap_ = pModelResourceViewHeap;
+	}
+
+	void SetCamera(ConstantBufferView<CameraConstant>* pCameraCbv)
+	{
+		pCameraCbv_ = pCameraCbv;
 	}
 
 	void SetTaskQueue(TaskQueue* pTaskQueue)
@@ -35,7 +40,7 @@ public:
 		pDepthStencil_ = pDepthStencil;
 	}
 
-	void SetupCommandList(Device* pDevice, CommandQueue* pCommandQueue)
+	virtual void SetupCommandList(Device* pDevice, CommandQueue* pCommandQueue)
 	{
 		pRootCommandQueue_ = pCommandQueue;
 
@@ -48,9 +53,9 @@ public:
 		mainCmds.push_back(pMainCommandList_);
 	}
 
-	void SetupGpuResources(Device* pDevice) {}
+	virtual void SetupGpuResources(Device* pDevice) {}
 
-	void SetupRenderPipeline(Device* pDevice, ConstantBufferView<CameraConstant>* pCameraCbv) 
+	virtual void SetupRenderPipeline(Device* pDevice)
 	{
 		// シェーダ
 		std::set<ulonglong> modelShaderHashes;
@@ -153,7 +158,7 @@ public:
 						pNativeList->SetPipelineState(pPipelineStateObjs_[shader].Get());
 						lastShader = shader;
 					}
-					model.CreateDrawCommand(pNativeList, pCameraCbv);
+					model.CreateDrawCommand(pNativeList, pCameraCbv_);
 				}
 
 				pList->Close();
@@ -163,9 +168,9 @@ public:
 		pTaskQueue_->WaitAll();
 	}
 
-	void Calc() {}
+	virtual void Calc() {}
 
-	void OpenDraw()
+	virtual void OpenDraw()
 	{
 		pMainCommandList_->Open(nullptr);
 		auto pNativeGraphicsList = pMainCommandList_->GraphicsList();
@@ -203,7 +208,7 @@ public:
 		}
 	}
 
-	void Draw(ID3D12DescriptorHeap* pHeap)
+	virtual void Draw()
 	{
 		auto pNativeGraphicsList = pMainCommandList_->GraphicsList();
 
@@ -219,7 +224,7 @@ public:
 		}
 	}
 
-	void CloseDraw(CommandQueue* pCommandQueue)
+	virtual void CloseDraw(CommandQueue* pCommandQueue)
 	{
 		auto pNativeGraphicsList = pMainCommandList_->GraphicsList();
 
@@ -248,6 +253,7 @@ public:
 private:
 	UniqueArray<Model>* pModels_;
 	ResourceViewHeap* pModelResourceViewHeap_;
+	ConstantBufferView<CameraConstant>* pCameraCbv_;
 
 	TaskQueue* pTaskQueue_;
 

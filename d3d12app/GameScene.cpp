@@ -42,12 +42,13 @@ void GameScene::Setup(Graphics& g)
 	cameraCbv_.Setup(&cbSrUavHeap_);
 
 	modelPass_.SetModels(&models_, &cbSrUavHeap_);
+	modelPass_.SetCamera(&cameraCbv_);
 	modelPass_.SetTaskQueue(&taskQueue_);
 	modelPass_.SetScreenSize(g.ScreenPtr()->Width(), g.ScreenPtr()->Height());
 	modelPass_.SetupCommandList(pDevice, g.CommandQueuePtr());
 
 	//modelPass_.SetupGpuResources(pDevice);
-	modelPass_.SetupRenderPipeline(pDevice, &cameraCbv_);
+	modelPass_.SetupRenderPipeline(pDevice);
 }
 
 
@@ -165,7 +166,7 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 	}
 	cpuTimer_.Stop(230);
 
-	modelPass_.Draw(cbSrUavHeap_.NativePtr());
+	modelPass_.Draw();
 
 	cpuTimer_.Start(265, "wait_models_cbuffer_update");
 	{
