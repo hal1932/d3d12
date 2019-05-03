@@ -12,10 +12,6 @@ struct CameraConstant
 class Model
 {
 public:
-	Model() {}
-
-	~Model() {}
-
 	int BufferCount() { return 2; }
 
 	Transform* TransformPtr() { return modelPtr_->TransformPtr(); }
@@ -27,11 +23,19 @@ public:
 	ulonglong ShaderHash() const { return modelPtr_->ShaderHash(); }
 
 	int MeshCount() { return modelPtr_->MeshCount(); }
+	int MeshCount() const { return modelPtr_->MeshCount(); }
 
-	void Setup(Device* pDevice, const char* filepath)
+	int ResourceBufferCount() { return 2 * MeshCount(); } // 1CB(SRT) + 1SR(Color) (/Mesh)
+	int ResourceBufferCount() const { return 2 * MeshCount(); }
+
+	void LoadFromFile(const char* filepath)
 	{
 		modelPtr_ = std::make_unique<fbx::Model>();
 		modelPtr_->LoadFromFile(filepath);
+	}
+
+	void UpdateResources(Device* pDevice)
+	{
 		modelPtr_->UpdateResources(pDevice);
 	}
 
@@ -54,11 +58,13 @@ public:
 				{ modelPtr_->MeshPtr(0)->MaterialPtr()->TexturePtr() } };
 			pTextureSrv_ = pHeap->CreateShaderResourceView(srvDesc);
 		}
+
+		pResourceViewHeap_ = pHeap;
 	}
 
-	void UpdateSubresources(CommandList* pCmdList, CommandQueue* pCmdQueue)
+	UpdateSubresourceContext* UpdateSubresources(CommandList* pCmdList, UpdateSubresourceContext* pContext)
 	{
-		modelPtr_->UpdateSubresources(pCmdList, pCmdQueue);
+		return modelPtr_->UpdateSubresources(pCmdList, pContext);
 	}
 
 	void SetShaderHash(ulonglong hash)
@@ -75,9 +81,10 @@ public:
 		}
 	}
 
-	void CreateDrawCommand(ID3D12GraphicsCommandList* pNativeList, ConstantBufferView<CameraConstant>* pCameraCb)
+	void CreateDrawCommand(ID3D12GraphicsCommandList* pNativeList, ConstantBufferView<CameraConstant>* pCameraCbv)
 	{
-		pNativeList->SetGraphicsRootDescriptorTable(1, pCameraCb->GpuDescriptorHandle());
+		pNativeList->SetGraphicsRootDescriptorTable(1, pCameraCbv->GpuDescriptorHandle());
+
 		if (pTextureSrv_ != nullptr)
 		{
 			pNativeList->SetGraphicsRootDescriptorTable(2, pTextureSrv_->GpuDescriptorHandle());
@@ -87,7 +94,7 @@ public:
 		{
 			const auto pMesh = modelPtr_->MeshPtr(i);
 
-			pMesh->SetRootDescriptorTable(pNativeList, 0);
+			pNativeList->SetGraphicsRootDescriptorTable(0, pMesh->TransformBufferPtr()->GpuDescriptorHandle());
 
 			auto vbView = pMesh->VertexBuffer()->GetVertexBufferView(sizeof(fbx::Mesh::Vertex));
 			pNativeList->IASetVertexBuffers(0, 1, &vbView);
@@ -102,6 +109,7 @@ public:
 private:
 	std::unique_ptr<fbx::Model> modelPtr_;
 
+	ResourceViewHeap* pResourceViewHeap_;
 	Resource* pTextureSrv_;
 
 	ulonglong shaderHash_;

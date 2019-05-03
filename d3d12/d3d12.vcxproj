@@ -95,6 +95,7 @@
     <ClCompile Include="GpuFence.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ResourceView.cpp" />
     <ClCompile Include="ResourceViewHeap.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="ScreenContext.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceDesc.h" />
+    <ClInclude Include="ResourceView.h" />
     <ClInclude Include="ResourceViewHeap.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="ScreenContext.h" />
@@ -141,6 +143,8 @@
     <ClInclude Include="TaskQueue.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="NonCopyable.h" />
+    <ClInclude Include="UniqueArray.h" />
     <ClInclude Include="UpdateSubresources.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowEvent.h" />

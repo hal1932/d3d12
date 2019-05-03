@@ -49,7 +49,6 @@ HRESULT UpdateSubresources(
 		return result;
 	}
 
-	pDestinationCommandList->Open(nullptr, false);
 	auto pNativeCommandList = pDestinationCommandList->GraphicsList();
 
 	{
@@ -77,8 +76,6 @@ HRESULT UpdateSubresources(
 			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ);
 		pNativeCommandList->ResourceBarrier(1, &barrier);
 	}
-
-	pNativeCommandList->Close();
 
 	return result;
 }

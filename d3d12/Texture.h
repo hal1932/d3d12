@@ -12,6 +12,7 @@ class Device;
 class Resource;
 class CommandList;
 class CommandQueue;
+struct UpdateSubresourceContext;
 
 class Texture
 {
@@ -22,7 +23,7 @@ public:
 
 	HRESULT LoadFromFile(const std::wstring& filepath);
 	HRESULT UpdateResources(Device* pDevice);
-	HRESULT UpdateSubresource(CommandList* pCommandList, CommandQueue* pCommandQueue);
+	UpdateSubresourceContext* UpdateSubresource(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 private:
 	std::unique_ptr<DirectX::TexMetadata> pData_ = nullptr;

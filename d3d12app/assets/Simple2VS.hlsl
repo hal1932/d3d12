@@ -1,5 +1,6 @@
 #include "SimpleDef.hlsli"
 
+[RootSignature(ROOT_SIGNATURE)]
 VSOutput VSFunc(const VSInput input)
 {
 	VSOutput output = (VSOutput)0;

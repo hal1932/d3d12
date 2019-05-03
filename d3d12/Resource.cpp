@@ -8,6 +8,27 @@
 #include "UpdateSubresources.h"
 #include <d3dx12.h>
 
+struct UpdateSubresourceContextData
+{
+	std::vector<std::unique_ptr<Resource>> intermediateResourcePtrs;
+
+	static UpdateSubresourceContextData* GetData(UpdateSubresourceContext* pContext) {
+		return reinterpret_cast<UpdateSubresourceContextData*>(pContext->pData);
+	}
+};
+
+UpdateSubresourceContext::UpdateSubresourceContext()
+{
+	pData = new UpdateSubresourceContextData();
+}
+
+UpdateSubresourceContext::~UpdateSubresourceContext()
+{
+	auto ptr = UpdateSubresourceContextData::GetData(this);
+	SafeDelete(&ptr);
+}
+
+
 Resource::Resource(ID3D12Resource* pResource, Device* pDevice)
 	: pDevice_(pDevice),
 	pResource_(pResource)
@@ -131,48 +152,37 @@ D3D12_INDEX_BUFFER_VIEW Resource::GetIndexBufferView(DXGI_FORMAT format)
 	};
 }
 
-HRESULT Resource::UpdateSubresource(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, CommandQueue* pCommandQueue, int subresource)
+UpdateSubresourceContext* Resource::UpdateSubresource(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, int subresource, UpdateSubresourceContext* pContext)
 {
-	return UpdateSubresources(pData, pCommandList, pCommandQueue, subresource, 1);
+	return UpdateSubresources(pData, pCommandList, subresource, 1, pContext);
 }
 
-HRESULT Resource::UpdateSubresources(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, CommandQueue* pCommandQueue, int firstSubresource, int subresourceCount)
+UpdateSubresourceContext* Resource::UpdateSubresources(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, int firstSubresource, int subresourceCount, UpdateSubresourceContext* pContext)
 {
-	HRESULT result;
+	auto pIntermediate = new Resource();
+	UpdateSubresourceContextData::GetData(pContext)->intermediateResourcePtrs.emplace_back(pIntermediate);
 
-	Resource intermediate;
-	result = ::UpdateSubresources(pDevice_, pData, firstSubresource, subresourceCount, this, pCommandList, &intermediate);
-	if (FAILED(result))
+	pContext->LastResult = ::UpdateSubresources(pDevice_, pData, firstSubresource, subresourceCount, this, pCommandList, pIntermediate);
+	if (FAILED(pContext->LastResult))
 	{
-		return result;
+		return pContext;
 	}
 
-	pCommandQueue->Submit(pCommandList);
-	result = pCommandQueue->WaitForExecution();
+	return pContext;
+}
 
-	return result;
+void Resource::SetDescriptorHandleLocation(ResourceViewHeap* pHeap, int handleOffset)
+{
+	pHeap_ = pHeap;
+	descriptorHandleOffset_ = handleOffset;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE Resource::CpuDescriptorHandle()
 {
-	if (pHeap_)
-	{
-		return pHeap_->CpuHandle(descriptorHandleIndex_);
-	}
-	return { 0 };
+	return pHeap_->CpuHandle(descriptorHandleOffset_);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE Resource::GpuDescriptorHandle()
 {
-	if (pHeap_)
-	{
-		return pHeap_->GpuHandle(descriptorHandleIndex_);
-	}
-	return{ 0 };
-}
-
-void Resource::SetResourceViewHeap(ResourceViewHeap* pHeap, int descriptorHandleIndex)
-{
-	pHeap_ = pHeap;
-	descriptorHandleIndex_ = descriptorHandleIndex;
+	return pHeap_->GpuHandle(descriptorHandleOffset_);
 }

@@ -78,9 +78,9 @@ HRESULT Mesh::UpdateResources(FbxMesh* pMesh, FbxPose* pBindPose, Device* pDevic
 	return pMaterial_->UpdateResources(pMesh, pDevice);
 }
 
-HRESULT Mesh::UpdateSubresources(CommandList* pCommandList, CommandQueue* pCommandQueue)
+UpdateSubresourceContext* Mesh::UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext)
 {
-	return pMaterial_->UpdateSubresources(pCommandList, pCommandQueue);
+	return pMaterial_->UpdateSubresources(pCommandList, pContext);
 }
 
 Mesh* Mesh::CreateReference()

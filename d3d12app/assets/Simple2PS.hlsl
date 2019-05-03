@@ -1,5 +1,6 @@
 #include "SimpleDef.hlsli"
 
+[RootSignature(ROOT_SIGNATURE)]
 PSOutput PSFunc(const VSOutput input)
 {
 	PSOutput output = (PSOutput)0;

@@ -82,6 +82,8 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ModelPass.h" />
+    <ClInclude Include="RenderPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\d3d12\d3d12.vcxproj">

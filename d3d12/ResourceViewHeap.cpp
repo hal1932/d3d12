@@ -75,7 +75,7 @@ std::vector<Resource*> ResourceViewHeap::CreateRenderTargetViewFromBackBuffer(Sc
 		auto pResource = new Resource(pView, pDevice_);
 
 		pNativeDevice->CreateRenderTargetView(pView, &viewDesc, handle);
-		pResource->SetResourceViewHeap(this, i);
+		pResource->SetDescriptorHandleLocation(this, i);
 		resourcePtrs.push_back(pResource);
 		
 		handle.ptr += descriptorSize_;
@@ -115,7 +115,7 @@ Resource* ResourceViewHeap::CreateDepthStencilView(ScreenContext* pContext, cons
 
 	auto handle = CpuHandle(currentSize_);
 	pNativeDevice->CreateDepthStencilView(pResource->NativePtr(), &viewDesc, handle);
-	pResource->SetResourceViewHeap(this, currentSize_);
+	pResource->SetDescriptorHandleLocation(this, currentSize_);
 
 	++currentSize_;
 
@@ -145,7 +145,7 @@ Resource* ResourceViewHeap::CreateConstantBufferView(const CsvDesc& desc)
 
 	auto handle = CpuHandle(currentSize_);
 	pNativeDevice->CreateConstantBufferView(&viewDesc, handle);
-	pResource->SetResourceViewHeap(this, currentSize_);
+	pResource->SetDescriptorHandleLocation(this, currentSize_);
 
 	++currentSize_;
 
@@ -173,7 +173,7 @@ Resource* ResourceViewHeap::CreateShaderResourceView(const SrvDesc& desc)
 			viewDesc.Texture1D.MostDetailedMip = 0;
 
 			pResource = desc.pTexture->ResourcePtr();
-			pResource->SetResourceViewHeap(this, currentSize_);
+			pResource->SetDescriptorHandleLocation(this, currentSize_);
 
 			break;
 		}

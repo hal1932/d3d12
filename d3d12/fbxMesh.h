@@ -8,7 +8,7 @@
 class Device;
 class Resource;
 class CommandList;
-class CommandQueue;
+struct UpdateSubresourceContext;
 
 namespace fbx
 {
@@ -44,8 +44,10 @@ namespace fbx
 		Resource* IndexBuffer() { return pIndexBuffer_; }
 		int IndexCount() { return *pIndexCount_; }
 
+		ConstantBufferView<TransformConstant>* TransformBufferPtr() { return &transformCbv_; }
+
 		HRESULT UpdateResources(FbxMesh* pMesh, FbxPose* pBindPose, Device* pDevice);
-		HRESULT UpdateSubresources(CommandList* pCommandList, CommandQueue* pCommandQueue);
+		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 		Mesh* CreateReference();
 
@@ -63,11 +65,6 @@ namespace fbx
 			TransformConstant cb;
 			cb.World = initialPose_.Matrix() * t;
 			transformCbv_.CopyBufferFrom(cb);
-		}
-
-		void SetRootDescriptorTable(ID3D12GraphicsCommandList* pList, int index)
-		{
-			pList->SetGraphicsRootDescriptorTable(index, transformCbv_.GpuDescriptorHandle());
 		}
 
 	private:

@@ -73,16 +73,13 @@ HRESULT Model::UpdateResources(Device* pDevice)
 	return UpdateResourcesRec_(pNode, pDevice);
 }
 
-HRESULT Model::UpdateSubresources(CommandList* pCommandList, CommandQueue* pCommandQueue)
+UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext)
 {
-	HRESULT result;
-
 	for (auto pMesh : meshPtrs_)
 	{
-		result |= pMesh->UpdateSubresources(pCommandList, pCommandQueue);
+		pContext = pMesh->UpdateSubresources(pCommandList, pContext);
 	}
-
-	return result;
+	return pContext;
 }
 
 Model* Model::CreateReference()

@@ -10,8 +10,8 @@
 class Device;
 class Resource;
 class CommandList;
-class CommandQueue;
 class Texture;
+struct UpdateSubresourceContext;
 
 namespace fbx
 {
@@ -36,7 +36,7 @@ namespace fbx
 
 		HRESULT LoadFromFile(const char* filepath);
 		HRESULT UpdateResources(Device* pDevice);
-		HRESULT UpdateSubresources(CommandList* pCommandList, CommandQueue* pCommandQueue);
+		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 		void SetShaderHash(ulonglong hash) { shaderHash_ = hash; }
 

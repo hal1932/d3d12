@@ -1,11 +1,13 @@
 #pragma once
 #include "ResourceDesc.h"
+#include "NonCopyable.h"
 
 class Device;
 class CommandList;
 class CommandQueue;
 class GpuFence;
 class ResourceViewHeap;
+
 
 class MappedResource
 {
@@ -53,6 +55,17 @@ private:
 	int subresource_;
 };
 
+
+struct UpdateSubresourceContext : NonCopyable<UpdateSubresourceContext>
+{
+	HRESULT LastResult;
+	void* pData;
+
+	UpdateSubresourceContext();
+	~UpdateSubresourceContext();
+};
+
+
 class Resource
 {
 public:
@@ -73,16 +86,17 @@ public:
 
 	MappedResource ScopedMap(int subresource);
 
-	HRESULT UpdateSubresource(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, CommandQueue* pCommandQueue, int subresource);
-	HRESULT UpdateSubresources(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, CommandQueue* pCommandQueue, int firstSubresource, int subresourceCount);
+	UpdateSubresourceContext* UpdateSubresource(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, int subresource, UpdateSubresourceContext* pContext);
+	UpdateSubresourceContext* UpdateSubresources(const D3D12_SUBRESOURCE_DATA* pData, CommandList* pCommandList, int firstSubresource, int subresourceCount, UpdateSubresourceContext* pContext);
 
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView(int stride);
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView(DXGI_FORMAT format);
 
+	void SetDescriptorHandleLocation(ResourceViewHeap* pHeap, int handleOffset);
+
+	ResourceViewHeap* OwnerHeap() { return pHeap_; }
 	D3D12_CPU_DESCRIPTOR_HANDLE CpuDescriptorHandle();
 	D3D12_GPU_DESCRIPTOR_HANDLE GpuDescriptorHandle();
-
-	void SetResourceViewHeap(ResourceViewHeap* pHeap, int descriptorHandleIndex);
 
 private:
 	Device* pDevice_ = nullptr;
@@ -90,7 +104,7 @@ private:
 	ResourceDesc desc_;
 
 	ResourceViewHeap* pHeap_ = nullptr;
-	int descriptorHandleIndex_ = -1;
+	int descriptorHandleOffset_ = -1;
 
 	HRESULT CreateCommitedImpl_(Device* pDevice, const ResourceDesc& desc, const D3D12_CLEAR_VALUE* pClearValue);
 };

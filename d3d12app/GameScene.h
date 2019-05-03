@@ -1,15 +1,19 @@
 #pragma once
-#include <array>
 #include <lib.h>
 #include "Model.h"
+#include "ModelArray.h"
+#include "ModelPass.h"
 
 class Graphics;
 
-const int cModelGridSize = 1;
+const int cModelGridSize = 2;
 const int cThreadCount = 3;
 
 class GameScene
 {
+public:
+	static const size_t cMaxModelCount = cModelGridSize * cModelGridSize * cModelGridSize;
+
 public:
 	~GameScene();
 
@@ -18,10 +22,7 @@ public:
 	void Draw(Graphics& g, GpuStopwatch* pStopwatch);
 
 private:
-	RootSignature rootSignature_;
-
-	std::array<std::unique_ptr<Model>, cModelGridSize * cModelGridSize * cModelGridSize> modelPtrs_;
-	std::map<tstring, ComPtr<ID3D12PipelineState>> pPipelineStates_;
+	UniqueArray<Model> models_;
 
 	ResourceViewHeap cbSrUavHeap_;
 
@@ -31,15 +32,12 @@ private:
 	Camera camera_;
 	ShaderManager shaders_;
 
-	D3D12_VIEWPORT viewport_;
-	D3D12_RECT scissorRect_;
-
 	CommandListQueue commandLists_;
 	TaskQueue taskQueue_;
 
 	CpuStopwatchBatch cpuTimer_;
 	uint frameIndex_;
 
-	void CreateModelCommand(Graphics& g);
+	ModelPass modelPass_;
 };
 

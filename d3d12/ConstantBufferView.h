@@ -10,15 +10,17 @@ public:
 	{
 		if (buffer_ != nullptr)
 		{
-			resourcePtr_->Unmap(0);
+			pResource_->Unmap(0);
 		}
 	}
+
+	Resource* ResourcePtr() { return pResource_.get(); }
 
 	void Setup(ResourceViewHeap* pHeap)
 	{
 		CsvDesc csvDesc = { sizeof(T), D3D12_TEXTURE_LAYOUT_ROW_MAJOR };
-		resourcePtr_ = std::unique_ptr<Resource>(pHeap->CreateConstantBufferView(csvDesc));
-		buffer_ = resourcePtr_->Map(0);
+		pResource_ = std::unique_ptr<Resource>(pHeap->CreateConstantBufferView(csvDesc));
+		buffer_ = pResource_->Map(0);
 	}
 
 	void CopyBufferFrom(const T& data)
@@ -28,11 +30,11 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GpuDescriptorHandle()
 	{
-		return resourcePtr_->GpuDescriptorHandle();
+		return pResource_->GpuDescriptorHandle();
 	}
 
 private:
-	std::unique_ptr<Resource> resourcePtr_;
+	std::unique_ptr<Resource> pResource_;
 	void* buffer_ = nullptr;
 };
 

@@ -23,6 +23,7 @@ public:
 	ID3D12RootSignature* NativePtr() { return pRootSignature_.Get(); }
 
 	HRESULT Create(Device* pDevice, const RootSignatureDesc& desc, UINT staticSamplerCount = 0, const CD3DX12_STATIC_SAMPLER_DESC* staticSamplers = nullptr);
+	HRESULT CreateFromShaderAttribute(Device* pDevice, Shader* pShader);
 
 private:
 	ComPtr<ID3D12RootSignature> pRootSignature_;

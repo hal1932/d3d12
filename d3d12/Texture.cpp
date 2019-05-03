@@ -42,15 +42,13 @@ HRESULT Texture::UpdateResources(Device* pDevice)
 	return result;
 }
 
-HRESULT Texture::UpdateSubresource(CommandList* pCommandList, CommandQueue* pCommandQueue)
+UpdateSubresourceContext* Texture::UpdateSubresource(CommandList* pCommandList, UpdateSubresourceContext* pContext)
 {
-	HRESULT result;
-
 	DirectX::ScratchImage image;
-	result = DirectX::LoadFromDDSFile(filepath_.c_str(), DirectX::DDS_FLAGS_NONE, pData_.get(), image);
-	if (FAILED(result))
+	pContext->LastResult = DirectX::LoadFromDDSFile(filepath_.c_str(), DirectX::DDS_FLAGS_NONE, pData_.get(), image);
+	if (FAILED(pContext->LastResult))
 	{
-		return result;
+		return pContext;
 	}
 
 	auto data = std::make_unique<D3D12_SUBRESOURCE_DATA[]>(image.GetImageCount());
@@ -62,7 +60,5 @@ HRESULT Texture::UpdateSubresource(CommandList* pCommandList, CommandQueue* pCom
 		data[i].SlicePitch = pSubImage.slicePitch;
 	}
 
-	result = pResource_->UpdateSubresources(data.get(), pCommandList, pCommandQueue, 0, static_cast<int>(image.GetImageCount()));
-
-	return result;
+	return pResource_->UpdateSubresources(data.get(), pCommandList, 0, static_cast<int>(image.GetImageCount()), pContext);
 }

@@ -28,3 +28,4 @@
 #include "CommandListQueue.h"
 #include "TaskQueue.h"
 #include "ConstantBufferView.h"
+#include "UniqueArray.h"

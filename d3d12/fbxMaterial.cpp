@@ -83,13 +83,13 @@ HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
 	return S_OK;
 }
 
-HRESULT Material::UpdateSubresources(CommandList* pCommandList, CommandQueue* pCommandQueue)
+UpdateSubresourceContext* Material::UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext)
 {
-	if (pTexture_ != nullptr)
+	if (pTexture_ == nullptr)
 	{
-		return pTexture_->UpdateSubresource(pCommandList, pCommandQueue);
+		throw std::invalid_argument("texture is not initialized");
 	}
-	return S_OK;
+	return pTexture_->UpdateSubresource(pCommandList, pContext);
 }
 
 Material* Material::CreateReference()

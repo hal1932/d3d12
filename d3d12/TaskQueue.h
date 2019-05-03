@@ -4,7 +4,7 @@
 #include <condition_variable>
 #include <functional>
 #include <queue>
-#include <iostream>
+#include <set>
 
 class TaskQueue
 {
@@ -25,11 +25,12 @@ public:
 		}
 	}
 
-	int ThreadCount() { return static_cast<int>(workers_.size()); }
+	size_t ThreadCount() { return workers_.size(); }
 
 	void Setup(int threadCount)
 	{
 		auto& queue = taskQueue_;
+		auto& onGoingTaskPtrs = onGoingTaskPtrs_;
 		auto& queueLock = queueLock_;
 		auto& enqueueEvent = enqueueEvent_;
 		auto& emptyEvent = emptyEvent_;
@@ -37,11 +38,12 @@ public:
 
 		for (auto i = 0; i < threadCount; ++i)
 		{
-			workers_.emplace_back([&queue, &queueLock, &enqueueEvent, &emptyEvent, &isExited]()
+			workers_.emplace_back([&queue, &onGoingTaskPtrs, &queueLock, &enqueueEvent, &emptyEvent, &isExited]()
 			{
 				while (true)
 				{
 					std::function<void()> task;
+					bool doTask = false;
 
 					{
 						std::unique_lock<std::mutex> lk(queueLock);
@@ -50,19 +52,29 @@ public:
 							return isExited || !queue.empty();
 						});
 
-						if (isExited && queue.empty())
+						if (isExited)
 						{
 							break;
 						}
 
-						task = std::move(queue.front());
-						queue.pop();
+						doTask = !queue.empty();
+
+						if (doTask)
+						{
+							task = std::move(queue.front());
+							queue.pop();
+							onGoingTaskPtrs.insert(&task);
+						}
 					}
 
-					task();
+					if (doTask)
+					{
+						task();
+					}
 
 					{
 						std::unique_lock<std::mutex> lk(queueLock);
+						onGoingTaskPtrs.erase(&task);
 						if (queue.empty())
 						{
 							emptyEvent.notify_all();
@@ -86,13 +98,18 @@ public:
 	{
 		auto& queue = taskQueue_;
 
-		std::unique_lock<std::mutex> lk(emptyLock_);
-		emptyEvent_.wait(lk, [&queue]() { return queue.empty(); });
+		enqueueEvent_.notify_all();
+		while (!onGoingTaskPtrs_.empty())
+		{
+			std::unique_lock<std::mutex> lk(emptyLock_);
+			emptyEvent_.wait(lk, [&queue]() { return queue.empty(); });
+		}
 	}
 
 private:
 	std::vector<std::thread> workers_;
 	std::queue<std::function<void()>> taskQueue_;
+	std::set<std::function<void()>*> onGoingTaskPtrs_;
 
 	std::mutex queueLock_;
 	std::condition_variable enqueueEvent_;

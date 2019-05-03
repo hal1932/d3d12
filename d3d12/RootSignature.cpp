@@ -184,3 +184,23 @@ HRESULT RootSignature::Create(Device* pDevice, const RootSignatureDesc& desc, UI
 
 	return result;
 }
+
+HRESULT RootSignature::CreateFromShaderAttribute(Device* pDevice, Shader* pShader)
+{
+	auto bytecode = pShader->NativeByteCode();
+
+	ComPtr<ID3DBlob> pRootSignatureBlob;
+	auto result = D3DGetBlobPart(bytecode.pShaderBytecode, bytecode.BytecodeLength, D3D_BLOB_ROOT_SIGNATURE, 0, &pRootSignatureBlob);
+	if (FAILED(result))
+	{
+		return result;
+	}
+
+	result = pDevice->NativePtr()->CreateRootSignature(
+		0,
+		pRootSignatureBlob->GetBufferPointer(),
+		pRootSignatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&pRootSignature_));
+
+	return result;
+}

@@ -35,6 +35,9 @@ struct CompiledShaderDesc
 };
 
 
+class Device;
+
+
 class Shader
 {
 public:

@@ -6,7 +6,7 @@
 class Device;
 class Texture;
 class CommandList;
-class CommandQueue;
+struct UpdateSubresourceContext;
 
 namespace fbx
 {
@@ -22,7 +22,7 @@ namespace fbx
 		Texture* TexturePtr() { return pTexture_; }
 
 		HRESULT UpdateResources(FbxGeometry* pGeom, Device* pDevice);
-		HRESULT UpdateSubresources(CommandList* pCommandList, CommandQueue* pCommandQueue);
+		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 		Material* CreateReference();
 
