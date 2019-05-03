@@ -54,40 +54,40 @@ int MainImpl(int, char**)
 
 	graphics.ResizeScreen(desc);
 
-	auto pScene = new GameScene();
-	pScene->Setup(graphics);
-
-	CpuStopwatch sw;
-	GpuStopwatch gsw;
-	gsw.Create(graphics.DevicePtr()->NativePtr(), 1);
-
-	FrameCounter counter(&sw, &gsw);
-
-	window.MessageLoop([&pScene, &graphics, &counter]()
 	{
-		counter.CpuWatchPtr()->Start();
+		auto pScene = std::make_unique<GameScene>();
+		pScene->Setup(graphics);
 
-		pScene->Calc(graphics);
-		pScene->Draw(graphics, counter.GpuWatchPtr());
+		CpuStopwatch sw;
+		GpuStopwatch gsw;
+		gsw.Create(graphics.DevicePtr()->NativePtr(), 1);
 
-		counter.CpuWatchPtr()->Stop();
-		counter.NextFrame();
+		FrameCounter counter(&sw, &gsw);
 
-		if (counter.CpuTime() > 1000.0)
+		window.MessageLoop([&pScene, &graphics, &counter]()
 		{
-			const auto frames = counter.FrameCount();
-			printf(
-				"fps: %d, CPU: %.4f %%, GPU: %.4f %%\n",
-				counter.FrameCount(),
-				counter.CpuUtilization(60),
-				counter.GpuUtilization(60));
-			counter.Reset();
-		}
-	});
+			counter.CpuWatchPtr()->Start();
 
-	graphics.WaitForCommandExecution();
+			pScene->Calc(graphics);
+			pScene->Draw(graphics, counter.GpuWatchPtr());
 
-	SafeDelete(&pScene);
+			counter.CpuWatchPtr()->Stop();
+			counter.NextFrame();
+
+			if (counter.CpuTime() > 1000.0)
+			{
+				const auto frames = counter.FrameCount();
+				printf(
+					"fps: %d, CPU: %.4f %%, GPU: %.4f %%\n",
+					counter.FrameCount(),
+					counter.CpuUtilization(60),
+					counter.GpuUtilization(60));
+				counter.Reset();
+			}
+		});
+
+		graphics.WaitForCommandExecution();
+	}
 
 	window.Close();
 
