@@ -72,11 +72,19 @@ public:
 		modelPtr_->SetShaderHash(hash);
 	}
 
+	void SetAnimCurrentFrame(size_t frame)
+	{
+		for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
+		{
+			modelPtr_->MeshPtr(i)->AnimStackPtr(0)->SetCurrentFrame(frame);
+		}
+	}
+
 	void SetTransform(const DirectX::XMMATRIX& world)
 	{
 		for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
 		{
-			auto m = modelPtr_->MeshPtr(i)->AnimStackPtr(0)->NextFrame() * world;
+			auto m = modelPtr_->MeshPtr(i)->AnimStackPtr(0)->NextFrame(true) * world;
 			modelPtr_->MeshPtr(i)->SetTransform(m);
 		}
 	}

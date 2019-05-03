@@ -42,12 +42,16 @@ namespace fbx
 		int StartFrame() { return start_; }
 		int StopFrame() { return stop_; }
 
-		const DirectX::XMMATRIX& NextFrame()
+		void SetStartFrame(int start) { start_ = start; }
+		void SetStopFrame(int stop) { stop_ = stop; }
+		void SetCurrentFrame(int current) { current_ = current; }
+
+		const DirectX::XMMATRIX& NextFrame(bool loop)
 		{
 			const auto& m = matrices_[current_];
 			if (++current_ >= FrameCount())
 			{
-				current_ = 0;
+				current_ = loop ? 0 : current_ - 1;
 			}
 			return m;
 		}

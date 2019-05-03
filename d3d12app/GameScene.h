@@ -12,7 +12,7 @@ const int cThreadCount = 3;
 class GameScene
 {
 public:
-	static const size_t cMaxModelCount = cModelGridSize * cModelGridSize * cModelGridSize;
+	static const size_t cModelCount = cModelGridSize * cModelGridSize * cModelGridSize;
 
 public:
 	~GameScene();

@@ -10,7 +10,7 @@ GameScene::~GameScene() {}
 void GameScene::Setup(Graphics& g)
 {
 	taskQueue_.Setup(cThreadCount);
-	models_.Resize(cMaxModelCount);
+	models_.Resize(cModelCount);
 
 	auto pDevice = g.DevicePtr();
 
@@ -49,6 +49,11 @@ void GameScene::Setup(Graphics& g)
 
 	//modelPass_.SetupGpuResources(pDevice);
 	modelPass_.SetupRenderPipeline(pDevice);
+
+	for (auto i = 0; i < models_.Size(); ++i)
+	{
+		models_[i].SetAnimCurrentFrame(i * 5);
+	}
 }
 
 
@@ -78,8 +83,14 @@ void GameScene::Calc(Graphics& g)
 		{
 			for (auto j = start; j < end; ++j)
 			{
+				const auto x = -2.0f + 4.0f * static_cast<float>((j / cModelGridSize) % cModelGridSize);
+				const auto y = -2.0f + 4.0f * static_cast<float>(j % cModelGridSize);
+				const auto z = -2.0f + 4.0f * static_cast<float>((j / (cModelGridSize * cModelGridSize)) % cModelGridSize);
+				const auto s = 0.25f;
+
 				auto t = models[j].TransformPtr();
-				t->SetTranslation(0.0f, std::sinf(static_cast<float>(frameIndex * 0.1)), 0.0f);
+				t->SetTranslation(x, y, z);
+				t->SetScaling(s, s, s);
 				t->UpdateMatrix();
 			}
 		});
@@ -88,7 +99,8 @@ void GameScene::Calc(Graphics& g)
 	{
 		auto& c = camera_;
 
-		c.SetPosition({ 10.0f, 5.0f, -10.0f + std::sinf(static_cast<float>(frameIndex_) / 10.0f) * 10.0f });
+		//c.SetPosition({ 10.0f, 5.0f, -10.0f + std::sinf(static_cast<float>(frameIndex_) / 10.0f) * 10.0f });
+		c.SetPosition({ 10.0f, 5.0f, -10.0f });
 		c.SetFocus({ 0.0f, 0.0f, 0.0f });
 		c.SetUp({ 0.0f, 1.0f, 0.0f });
 
