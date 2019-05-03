@@ -77,8 +77,11 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelPass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CameraConstant.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Model.h" />

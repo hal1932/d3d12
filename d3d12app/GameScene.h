@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "ModelArray.h"
 #include "ModelPass.h"
+#include "CameraConstant.h"
 
 class Graphics;
 

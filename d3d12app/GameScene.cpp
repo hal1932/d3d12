@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "Graphics.h"
+#include "CameraConstant.h"
 #include <cmath>
 #include <set>
 
