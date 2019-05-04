@@ -20,7 +20,7 @@ namespace fbx
 	class Model
 	{
 	public:
-		Model();
+		Model(FbxScene* pScene);
 		~Model();
 
 		Transform* TransformPtr() { return &transform_; }
@@ -38,16 +38,18 @@ namespace fbx
 		HRESULT UpdateResources(Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
+		void LoadAnimStacks(int meshIndex);
+
 		void SetShaderHash(ulonglong hash) { shaderHash_ = hash; }
 
 		Model* CreateReference();
 
 	private:
+		FbxScene* pScene_;
+
 		bool isReference_ = false;
 
 		tstring name_;
-		FbxScene* pScene_ = nullptr;
-		FbxImporter* pSceneImporter_ = nullptr;
 		std::vector<Mesh*> meshPtrs_;
 
 		Transform transform_;

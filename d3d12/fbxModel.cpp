@@ -11,59 +11,16 @@
 using namespace fbx;
 using namespace fbxsdk;
 
-Model::Model() {}
+Model::Model(FbxScene* pScene)
+	: pScene_(pScene)
+{}
+
 
 Model::~Model()
 {
 	SafeDeleteSequence(&meshPtrs_);
-	SafeDestroy(&pSceneImporter_);
-
-	if (!isReference_)
-	{
-		SafeDestroy(&pScene_);
-	}
 }
 
-
-HRESULT Model::LoadFromFile(const char* filepath)
-{
-	auto pSceneImporter = FbxImporter::Create(GetManager(), "");
-
-	auto result = pSceneImporter->Initialize(filepath, -1, GetManager()->GetIOSettings());
-	if (!result)
-	{
-		auto error = pSceneImporter->GetStatus().GetErrorString();
-		std::cerr << error << std::endl;
-
-		SafeDestroy(&pSceneImporter);
-		return S_FALSE;
-	}
-
-	SafeDestroy(&pScene_);
-	pScene_ = FbxScene::Create(GetManager(), "");
-	if (pScene_ == nullptr)
-	{
-		auto error = pSceneImporter->GetStatus().GetErrorString();
-		std::cerr << error << std::endl;
-
-		SafeDestroy(&pSceneImporter);
-		return S_FALSE;
-	}
-
-	result = pSceneImporter->Import(pScene_);
-	if (!result)
-	{
-		auto error = pSceneImporter->GetStatus().GetErrorString();
-		std::cerr << error << std::endl;
-
-		SafeDestroy(&pSceneImporter);
-		return S_FALSE;
-	}
-
-	pSceneImporter_ = pSceneImporter;
-
-	return S_OK;
-}
 
 HRESULT Model::UpdateResources(Device* pDevice)
 {
@@ -72,6 +29,7 @@ HRESULT Model::UpdateResources(Device* pDevice)
 	auto pNode = pScene_->GetRootNode();
 	return UpdateResourcesRec_(pNode, pDevice);
 }
+
 
 UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext)
 {
@@ -82,13 +40,19 @@ UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCommandList, U
 	return pContext;
 }
 
+
+void Model::LoadAnimStacks(int meshIndex)
+{
+	//MeshPtr(meshIndex)->LoadAnimStacks(pScene_, pSceneImporter_);
+}
+
+
 Model* Model::CreateReference()
 {
-	auto other = new Model();
+	auto other = new Model(pScene_);
 	other->isReference_ = true;
 
 	other->name_ = name_;
-	other->pScene_ = pScene_;
 
 	other->meshPtrs_.resize(meshPtrs_.size());
 	for (auto i = 0; i < meshPtrs_.size(); ++i)
@@ -98,6 +62,7 @@ Model* Model::CreateReference()
 
 	return other;
 }
+
 
 HRESULT Model::UpdateResourcesRec_(FbxNode* pNode, Device* pDevice)
 {
@@ -118,12 +83,9 @@ HRESULT Model::UpdateResourcesRec_(FbxNode* pNode, Device* pDevice)
 		{
 			case FbxNodeAttribute::eMesh:
 			{
-				auto pMesh = new Mesh();
-				pMesh->UpdateResources(pNode->GetMesh(), pDevice);
+				auto pMesh = new Mesh(pNode->GetMesh());
+				pMesh->UpdateResources(pDevice);
 				meshPtrs_.push_back(pMesh);
-
-				pMesh->LoadAnimStacks(pNode->GetMesh(), pScene_, pSceneImporter_);
-
 				break;
 			}
 
