@@ -119,7 +119,7 @@ HRESULT Model::UpdateResourcesRec_(FbxNode* pNode, Device* pDevice)
 			case FbxNodeAttribute::eMesh:
 			{
 				auto pMesh = new Mesh();
-				pMesh->UpdateResources(pNode->GetMesh(), pScene_->GetPose(0), pDevice);
+				pMesh->UpdateResources(pNode->GetMesh(), pDevice);
 				meshPtrs_.push_back(pMesh);
 
 				pMesh->LoadAnimStacks(pNode->GetMesh(), pScene_, pSceneImporter_);

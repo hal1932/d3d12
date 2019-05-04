@@ -46,7 +46,7 @@ namespace fbx
 
 		ConstantBufferView<TransformConstant>* TransformBufferPtr() { return &transformCbv_; }
 
-		HRESULT UpdateResources(FbxMesh* pMesh, FbxPose* pBindPose, Device* pDevice);
+		HRESULT UpdateResources(FbxMesh* pMesh, Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 		Mesh* CreateReference();

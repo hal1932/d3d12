@@ -92,6 +92,7 @@
     <ClCompile Include="fbxMaterial.cpp" />
     <ClCompile Include="fbxMesh.cpp" />
     <ClCompile Include="fbxModel.cpp" />
+    <ClCompile Include="fbxModelAnim.cpp" />
     <ClCompile Include="GpuFence.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="Resource.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="fbxMaterial.h" />
     <ClInclude Include="fbxMesh.h" />
     <ClInclude Include="fbxModel.h" />
+    <ClInclude Include="fbxModelAnim.h" />
     <ClInclude Include="FrameCounter.h" />
     <ClInclude Include="GpuFence.h" />
     <ClInclude Include="GpuStopwatch.h" />

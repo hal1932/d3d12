@@ -27,7 +27,7 @@ Mesh::~Mesh()
 	SafeDelete(&pMaterial_);
 }
 
-HRESULT Mesh::UpdateResources(FbxMesh* pMesh, FbxPose* pBindPose, Device* pDevice)
+HRESULT Mesh::UpdateResources(FbxMesh* pMesh, Device* pDevice)
 {
 	Setup_();
 
