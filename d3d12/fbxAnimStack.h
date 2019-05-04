@@ -21,7 +21,7 @@ namespace fbx
 			stop_ = (int)(stop.Get() / period.Get());
 
 			const auto count = stop_ - start_ + 1;
-			matrices_ = std::make_unique < DirectX::XMMATRIX[]>(count);
+			matrices_ = std::make_unique<DirectX::XMMATRIX[]>(count);
 
 			const auto pNode = pMesh->GetNode();
 			for (auto i = start_; i <= stop_; ++i)
