@@ -1,12 +1,13 @@
 #pragma once
 #include "common.h"
 #include "fbxCommon.h"
+#include "AnimCurve.h"
 #include <Windows.h>
 #include <DirectXMath.h>
 
 namespace fbx
 {
-	class AnimStack
+	class AnimStack : public AnimCurve
 	{
 	public:
 		AnimStack(FbxMesh* pMesh, fbxsdk::FbxTakeInfo* pTakeInfo, fbxsdk::FbxTime::EMode mode)
@@ -37,24 +38,27 @@ namespace fbx
 
 		~AnimStack() {}
 
-		const DirectX::XMMATRIX& Matrix(int frame) { return matrices_[frame]; }
-		int FrameCount() { return stop_ - start_ + 1; }
-		int StartFrame() { return start_; }
-		int StopFrame() { return stop_; }
+		//const DirectX::XMMATRIX& Matrix(int frame) { return matrices_[frame]; }
+		virtual DirectX::XMMATRIX Evaluate(float frame) { return matrices_[static_cast<size_t>(frame)]; }
+		//int FrameCount() { return stop_ - start_ + 1; }
+		//int StartFrame() { return start_; }
+		//int StopFrame() { return stop_; }
+		virtual float StartFrame() { return static_cast<float>(start_); }
+		virtual float EndFrame() { return static_cast<float>(stop_); }
 
-		void SetStartFrame(int start) { start_ = start; }
-		void SetStopFrame(int stop) { stop_ = stop; }
-		void SetCurrentFrame(int current) { current_ = current; }
+		//void SetStartFrame(int start) { start_ = start; }
+		//void SetStopFrame(int stop) { stop_ = stop; }
+		//void SetCurrentFrame(int current) { current_ = current; }
 
-		const DirectX::XMMATRIX& NextFrame(bool loop)
-		{
-			const auto& m = matrices_[current_];
-			if (++current_ >= FrameCount())
-			{
-				current_ = loop ? 0 : current_ - 1;
-			}
-			return m;
-		}
+		//const DirectX::XMMATRIX& NextFrame(bool loop)
+		//{
+		//	const auto& m = matrices_[current_];
+		//	if (++current_ >= FrameCount())
+		//	{
+		//		current_ = loop ? 0 : current_ - 1;
+		//	}
+		//	return m;
+		//}
 
 	private:
 		int start_;

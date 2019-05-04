@@ -14,6 +14,7 @@
 #include "Shader.h"
 #include "RootSignature.h"
 #include "fbxCommon.h"
+#include "fbxScene.h"
 #include "fbxModel.h"
 #include "fbxMesh.h"
 #include "fbxAnimation.h"
@@ -29,3 +30,5 @@
 #include "TaskQueue.h"
 #include "ConstantBufferView.h"
 #include "UniqueArray.h"
+#include "AnimCurve.h"
+#include "AnimPlayer.h"

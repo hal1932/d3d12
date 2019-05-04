@@ -84,15 +84,17 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimPlayer.cpp" />
     <ClCompile Include="CommandList.cpp" />
     <ClCompile Include="CommandListQueue.cpp" />
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="Device.cpp" />
+    <ClCompile Include="fbxAnimStack.cpp" />
     <ClCompile Include="fbxCommon.cpp" />
     <ClCompile Include="fbxMaterial.cpp" />
     <ClCompile Include="fbxMesh.cpp" />
     <ClCompile Include="fbxModel.cpp" />
-    <ClCompile Include="fbxModelAnim.cpp" />
+    <ClCompile Include="fbxScene.cpp" />
     <ClCompile Include="GpuFence.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="Resource.cpp" />
@@ -111,6 +113,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\d3d12app\Camera.h" />
+    <ClInclude Include="AnimCurve.h" />
+    <ClInclude Include="AnimPlayer.h" />
     <ClInclude Include="CommandList.h" />
     <ClInclude Include="CommandListQueue.h" />
     <ClInclude Include="CommandQueue.h" />
@@ -125,7 +129,7 @@
     <ClInclude Include="fbxMaterial.h" />
     <ClInclude Include="fbxMesh.h" />
     <ClInclude Include="fbxModel.h" />
-    <ClInclude Include="fbxModelAnim.h" />
+    <ClInclude Include="fbxScene.h" />
     <ClInclude Include="FrameCounter.h" />
     <ClInclude Include="GpuFence.h" />
     <ClInclude Include="GpuStopwatch.h" />

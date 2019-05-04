@@ -73,6 +73,9 @@
     <None Include="assets\test_c.fbx">
       <Filter>assets</Filter>
     </None>
+    <None Include="assets\test_skeletal_anim.fbx">
+      <Filter>assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="assets\Simple2PS.hlsl">

@@ -32,7 +32,7 @@ namespace fbx
 		};
 
 	public:
-		Mesh();
+		Mesh(FbxMesh* pMesh);
 		~Mesh();
 
 		Material* MaterialPtr() { return pMaterial_; }
@@ -46,14 +46,14 @@ namespace fbx
 
 		ConstantBufferView<TransformConstant>* TransformBufferPtr() { return &transformCbv_; }
 
-		HRESULT UpdateResources(FbxMesh* pMesh, Device* pDevice);
+		HRESULT UpdateResources(Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 		Mesh* CreateReference();
 
-		void LoadAnimStacks(FbxMesh* pMesh, FbxScene* pScene, FbxImporter* pSceneImporter);
+		void LoadAnimStacks(FbxScene* pScene, FbxImporter* pSceneImporter);
 		size_t AnimStackCount() { return pAnimStacks_.size(); }
-		AnimStack* AnimStackPtr(int index) { return pAnimStacks_[index].get(); }
+		AnimStack* AnimStackPtr(int index) { return AnimStackCount() > index ? pAnimStacks_[index].get() : nullptr; }
 
 		void SetupBuffers(ResourceViewHeap* pHeap)
 		{
@@ -68,6 +68,7 @@ namespace fbx
 		}
 
 	private:
+		FbxMesh* pMesh_;
 		bool isReference_ = false;
 
 		Resource* pVertexBuffer_ = nullptr;
@@ -84,8 +85,8 @@ namespace fbx
 		ConstantBufferView<TransformConstant> transformCbv_;
 
 		void Setup_();
-		void UpdateVertexResources_(FbxMesh* pMesh, Device* pDevice);
-		void UpdateIndexResources_(FbxMesh* pMesh, Device* pDevice);
+		void UpdateVertexResources_(Device* pDevice);
+		void UpdateIndexResources_(Device* pDevice);
 	};
 
 }// namespace fbx

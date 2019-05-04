@@ -2,37 +2,39 @@
 #include "CameraConstant.h"
 
 
-void Model::LoadFromFile(const char* filepath)
+void Model::LoadFromFile(const char* filePath)
 {
-	modelPtr_ = std::make_unique<fbx::Model>();
-	modelPtr_->LoadFromFile(filepath);
+	pScene_ = std::make_unique<fbx::Scene>();
+	pScene_->LoadFromFile(filePath);
+
+	pModel_ = pScene_->CreateModel();
 }
 
 
 void Model::UpdateResources(Device* pDevice)
 {
-	modelPtr_->UpdateResources(pDevice);
+	pModel_->UpdateResources(pDevice);
 }
 
 
 void Model::SetupAsReference(Model* pModel)
 {
-	modelPtr_ = std::unique_ptr<fbx::Model>(pModel->modelPtr_->CreateReference());
+	pModel_ = std::unique_ptr<fbx::Model>(pModel->pModel_->CreateReference());
 }
 
 
 void Model::SetupBuffers(ResourceViewHeap* pHeap)
 {
-	for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
+	for (auto i = 0; i < pModel_->MeshCount(); ++i)
 	{
-		modelPtr_->MeshPtr(i)->SetupBuffers(pHeap);
+		pModel_->MeshPtr(i)->SetupBuffers(pHeap);
 	}
 
-	if (modelPtr_->MeshPtr(0)->MaterialPtr()->TexturePtr() != nullptr)
+	if (pModel_->MeshPtr(0)->MaterialPtr()->TexturePtr() != nullptr)
 	{
 		const SrvDesc srvDesc = {
 			D3D12_SRV_DIMENSION_TEXTURE2D,
-			{ modelPtr_->MeshPtr(0)->MaterialPtr()->TexturePtr() } };
+			{ pModel_->MeshPtr(0)->MaterialPtr()->TexturePtr() } };
 		pTextureSrv_ = pHeap->CreateShaderResourceView(srvDesc);
 	}
 
@@ -42,31 +44,31 @@ void Model::SetupBuffers(ResourceViewHeap* pHeap)
 
 UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCmdList, UpdateSubresourceContext* pContext)
 {
-	return modelPtr_->UpdateSubresources(pCmdList, pContext);
+	return pModel_->UpdateSubresources(pCmdList, pContext);
 }
 
 
 void Model::SetShaderHash(ulonglong hash)
 {
-	modelPtr_->SetShaderHash(hash);
+	pModel_->SetShaderHash(hash);
 }
 
 
-void Model::SetAnimCurrentFrame(size_t frame)
-{
-	for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
-	{
-		modelPtr_->MeshPtr(i)->AnimStackPtr(0)->SetCurrentFrame(frame);
-	}
-}
+//void Model::SetAnimCurrentFrame(size_t frame)
+//{
+//	for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
+//	{
+//		modelPtr_->MeshPtr(i)->AnimStackPtr(0)->SetCurrentFrame(frame);
+//	}
+//}
 
 
 void Model::SetTransform(const DirectX::XMMATRIX& world)
 {
-	for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
+	for (auto i = 0; i < pModel_->MeshCount(); ++i)
 	{
-		auto m = modelPtr_->MeshPtr(i)->AnimStackPtr(0)->NextFrame(true) * world;
-		modelPtr_->MeshPtr(i)->SetTransform(m);
+		//auto m = modelPtr_->MeshPtr(i)->AnimStackPtr(0)->NextFrame(true) * world;
+		pModel_->MeshPtr(i)->SetTransform(world);
 	}
 }
 
@@ -80,9 +82,9 @@ void Model::CreateDrawCommand(ID3D12GraphicsCommandList* pNativeList, ConstantBu
 		pNativeList->SetGraphicsRootDescriptorTable(2, pTextureSrv_->GpuDescriptorHandle());
 	}
 
-	for (auto i = 0; i < modelPtr_->MeshCount(); ++i)
+	for (auto i = 0; i < pModel_->MeshCount(); ++i)
 	{
-		const auto pMesh = modelPtr_->MeshPtr(i);
+		const auto pMesh = pModel_->MeshPtr(i);
 
 		pNativeList->SetGraphicsRootDescriptorTable(0, pMesh->TransformBufferPtr()->GpuDescriptorHandle());
 

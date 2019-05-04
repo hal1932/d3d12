@@ -87,7 +87,7 @@ UpdateSubresourceContext* Material::UpdateSubresources(CommandList* pCommandList
 {
 	if (pTexture_ == nullptr)
 	{
-		throw std::invalid_argument("texture is not initialized");
+		return pContext;
 	}
 	return pTexture_->UpdateSubresource(pCommandList, pContext);
 }

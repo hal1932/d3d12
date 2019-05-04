@@ -99,7 +99,7 @@ public:
 		auto& queue = taskQueue_;
 
 		enqueueEvent_.notify_all();
-		while (!onGoingTaskPtrs_.empty())
+		while (!(queue.empty() && onGoingTaskPtrs_.empty()))
 		{
 			std::unique_lock<std::mutex> lk(emptyLock_);
 			emptyEvent_.wait(lk, [&queue]() { return queue.empty(); });

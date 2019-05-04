@@ -7,7 +7,7 @@
 
 class Graphics;
 
-const int cModelGridSize = 2;
+const int cModelGridSize = 1;
 const int cThreadCount = 3;
 
 class GameScene

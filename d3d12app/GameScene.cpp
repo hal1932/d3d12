@@ -51,10 +51,17 @@ void GameScene::Setup(Graphics& g)
 	//modelPass_.SetupGpuResources(pDevice);
 	modelPass_.SetupRenderPipeline(pDevice);
 
-	for (auto i = 0; i < models_.Size(); ++i)
-	{
-		models_[i].SetAnimCurrentFrame(i * 5);
-	}
+	//for (auto& model : models_)
+	//{
+	//	for (auto i = 0; i < model.MeshCount(); ++i)
+	//	{
+	//		model.LoadAnimStacks(i);
+	//	}
+	//}
+	//for (auto i = 0; i < models_.Size(); ++i)
+	//{
+	//	models_[i].SetAnimCurrentFrame(i * 5);
+	//}
 }
 
 
@@ -84,10 +91,15 @@ void GameScene::Calc(Graphics& g)
 		{
 			for (auto j = start; j < end; ++j)
 			{
+#if false
 				const auto x = -2.0f + 4.0f * static_cast<float>((j / cModelGridSize) % cModelGridSize);
 				const auto y = -2.0f + 4.0f * static_cast<float>(j % cModelGridSize);
 				const auto z = -2.0f + 4.0f * static_cast<float>((j / (cModelGridSize * cModelGridSize)) % cModelGridSize);
 				const auto s = 0.25f;
+#else
+				const auto x = 0.0f, y = 0.0f, z = 0.0f;
+				const auto s = 1.0f;
+#endif
 
 				auto t = models[j].TransformPtr();
 				t->SetTranslation(x, y, z);
