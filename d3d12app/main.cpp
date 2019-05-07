@@ -56,6 +56,7 @@ int MainImpl(int, char**)
 
 	{
 		auto pScene = std::make_unique<GameScene>();
+		//std::unique_ptr<GameScene> pScene(new GameScene());
 		pScene->Setup(graphics);
 
 		CpuStopwatch sw;

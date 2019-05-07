@@ -2,6 +2,7 @@
 #include "fbxsdk.h"
 #include "Transform.h"
 #include "ConstantBufferView.h"
+#include "fbxSkinCluster.h"
 #include <DirectXMath.h>
 #include <Windows.h>
 
@@ -13,7 +14,7 @@ struct UpdateSubresourceContext;
 namespace fbx
 {
 	class Material;
-	class AnimStack;
+	class SkinCluster;
 
 	__declspec(align(256))
 	struct TransformConstant
@@ -49,11 +50,11 @@ namespace fbx
 		HRESULT UpdateResources(Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
-		Mesh* CreateReference();
+		HRESULT LoadSkinClusters();
+		size_t SkinClusterCount() { return skinClusterPtrs_.size(); }
+		SkinCluster* SkinClusterPtr(size_t index) { return skinClusterPtrs_[index].get(); }
 
-		void LoadAnimStacks(FbxScene* pScene, FbxImporter* pSceneImporter);
-		size_t AnimStackCount() { return pAnimStacks_.size(); }
-		AnimStack* AnimStackPtr(int index) { return AnimStackCount() > index ? pAnimStacks_[index].get() : nullptr; }
+		Mesh* CreateReference();
 
 		void SetupBuffers(ResourceViewHeap* pHeap)
 		{
@@ -80,7 +81,7 @@ namespace fbx
 		Material* pMaterial_ = nullptr;
 		Transform initialPose_;
 
-		std::vector<std::unique_ptr<AnimStack>> pAnimStacks_;
+		std::vector<std::unique_ptr<SkinCluster>> skinClusterPtrs_;
 
 		ConstantBufferView<TransformConstant> transformCbv_;
 

@@ -24,7 +24,8 @@ void GameScene::Setup(Graphics& g)
 		UpdateSubresourceContext context;
 		for (auto& model : models_)
 		{
-			model.LoadFromFile("assets/test_anim.fbx");
+			//model.LoadFromFile("assets/test_anim.fbx");
+			model.LoadFromFile("assets/test_skeletal_anim.fbx");
 			model.UpdateResources(pDevice);
 			model.UpdateSubresources(pCommandList.get(), &context);
 			resourceViewCount += model.ResourceBufferCount();

@@ -3,7 +3,9 @@
 #include "common.h"
 #include "fbxCommon.h"
 #include "fbxModel.h"
+#include "fbxAnimStack.h"
 #include <iostream>
+#include <stack>
 
 
 using namespace fbx;
@@ -51,6 +53,13 @@ HRESULT Scene::LoadFromFile(const char* filePath)
 		return S_FALSE;
 	}
 
+	const auto animCurveCount = pScene_->GetSrcObjectCount<FbxAnimCurve>();
+	for (auto i = 0; i < animCurveCount; ++i)
+	{
+		auto pAnimCurve = pScene_->GetSrcObject<FbxAnimCurve>(i);
+		animCurvePtrs_[pAnimCurve->GetUniqueID()] = std::make_unique<AnimCurve>(pAnimCurve);
+	}
+
 	pSceneImporter_ = pSceneImporter;
 
 	return S_OK;
@@ -58,7 +67,41 @@ HRESULT Scene::LoadFromFile(const char* filePath)
 }
 
 
+void Scene::GetFbxNodeRecursive(FbxNodeAttribute::EType type, std::function<void(FbxNode*)> callback)
+{
+	auto stack = std::stack<FbxNode*>();
+	stack.push(pScene_->GetRootNode());
+
+	while (!stack.empty())
+	{
+		auto pNode = stack.top();
+		stack.pop();
+
+		const auto pAttribute = pNode->GetNodeAttribute();
+		if (pAttribute != nullptr)
+		{
+			const auto attrType = pAttribute->GetAttributeType();
+			if (attrType == type)
+			{
+				callback(pNode);
+			}
+		}
+
+		for (auto i = 0; i < pNode->GetChildCount(); ++i)
+		{
+			stack.push(pNode->GetChild(i));
+		}
+	}
+}
+
+
 std::unique_ptr<Model> Scene::CreateModel()
 {
-	return std::move(std::make_unique<Model>(pScene_));
+	return std::move(std::make_unique<Model>(this));
+}
+
+
+std::unique_ptr<AnimStack> Scene::CreateAnimStack(size_t index)
+{
+	return std::move(std::make_unique<AnimStack>(this, index));
 }

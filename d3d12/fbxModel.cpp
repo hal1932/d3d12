@@ -5,13 +5,14 @@
 #include "Texture.h"
 #include "fbxMesh.h"
 #include "fbxCommon.h"
+#include "fbxScene.h"
 #include <iostream>
 #include <vector>
 
 using namespace fbx;
 using namespace fbxsdk;
 
-Model::Model(FbxScene* pScene)
+Model::Model(Scene* pScene)
 	: pScene_(pScene)
 {}
 
@@ -26,8 +27,21 @@ HRESULT Model::UpdateResources(Device* pDevice)
 {
 	SafeDeleteSequence(&meshPtrs_);
 
-	auto pNode = pScene_->GetRootNode();
-	return UpdateResourcesRec_(pNode, pDevice);
+	auto result = S_OK;
+
+	auto& meshes = meshPtrs_;
+	pScene_->GetFbxNodeRecursive(FbxNodeAttribute::eMesh, [&result, &meshes, pDevice](auto pNode)
+	{
+		auto pMesh = new Mesh(pNode->GetMesh());
+		result = pMesh->UpdateResources(pDevice);
+		if (SUCCEEDED(result))
+		{
+			meshes.push_back(pMesh);
+		}
+		pMesh->LoadSkinClusters();
+	});
+
+	return result;
 }
 
 
@@ -38,12 +52,6 @@ UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCommandList, U
 		pContext = pMesh->UpdateSubresources(pCommandList, pContext);
 	}
 	return pContext;
-}
-
-
-void Model::LoadAnimStacks(int meshIndex)
-{
-	//MeshPtr(meshIndex)->LoadAnimStacks(pScene_, pSceneImporter_);
 }
 
 
@@ -61,43 +69,4 @@ Model* Model::CreateReference()
 	}
 
 	return other;
-}
-
-
-HRESULT Model::UpdateResourcesRec_(FbxNode* pNode, Device* pDevice)
-{
-	if (!pNode)
-	{
-		return S_FALSE;
-	}
-
-	//std::cout << pNode->GetName() << " " << pNode->GetTypeName() << std::endl;
-
-	auto pAttribute = pNode->GetNodeAttribute();
-	if (pAttribute)
-	{
-		name_ = pAttribute->GetName();
-
-		auto type = pAttribute->GetAttributeType();
-		switch (type)
-		{
-			case FbxNodeAttribute::eMesh:
-			{
-				auto pMesh = new Mesh(pNode->GetMesh());
-				pMesh->UpdateResources(pDevice);
-				meshPtrs_.push_back(pMesh);
-				break;
-			}
-
-			default:
-				break;
-		}
-	}
-
-	for (int i = 0; i < pNode->GetChildCount(); ++i)
-	{
-		UpdateResourcesRec_(pNode->GetChild(i), pDevice);
-	}
-
-	return S_OK;
 }

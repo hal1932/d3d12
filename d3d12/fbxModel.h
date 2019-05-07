@@ -15,12 +15,13 @@ struct UpdateSubresourceContext;
 
 namespace fbx
 {
+	class Scene;
 	class Mesh;
 
 	class Model
 	{
 	public:
-		Model(FbxScene* pScene);
+		Model(Scene* pScene);
 		~Model();
 
 		Transform* TransformPtr() { return &transform_; }
@@ -38,14 +39,12 @@ namespace fbx
 		HRESULT UpdateResources(Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
-		void LoadAnimStacks(int meshIndex);
-
 		void SetShaderHash(ulonglong hash) { shaderHash_ = hash; }
 
 		Model* CreateReference();
 
 	private:
-		FbxScene* pScene_;
+		Scene* pScene_;
 
 		bool isReference_ = false;
 
@@ -55,9 +54,6 @@ namespace fbx
 		Transform transform_;
 
 		ulonglong shaderHash_;
-
-		HRESULT UpdateResourcesRec_(fbxsdk::FbxNode* pNode, Device* pDevice);
-		void UpdateMaterialResources_(fbxsdk::FbxGeometry* pMesh, Device* pDevice);
 	};
 
 }// namespace fbx

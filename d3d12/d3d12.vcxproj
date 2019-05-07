@@ -89,7 +89,6 @@
     <ClCompile Include="CommandListQueue.cpp" />
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="Device.cpp" />
-    <ClCompile Include="fbxAnimStack.cpp" />
     <ClCompile Include="fbxCommon.cpp" />
     <ClCompile Include="fbxMaterial.cpp" />
     <ClCompile Include="fbxMesh.cpp" />
@@ -124,6 +123,9 @@
     <ClInclude Include="CpuStopwatchBatch.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Device.h" />
+    <ClInclude Include="fbxAnimCurve.h" />
+    <ClInclude Include="fbxAnimCurveNode.h" />
+    <ClInclude Include="fbxAnimLayer.h" />
     <ClInclude Include="fbxAnimStack.h" />
     <ClInclude Include="fbxCommon.h" />
     <ClInclude Include="fbxMaterial.h" />
@@ -131,6 +133,7 @@
     <ClInclude Include="fbxModel.h" />
     <ClInclude Include="fbxScene.h" />
     <ClInclude Include="FrameCounter.h" />
+    <ClInclude Include="fbxSkinCluster.h" />
     <ClInclude Include="GpuFence.h" />
     <ClInclude Include="GpuStopwatch.h" />
     <ClInclude Include="InputLayout.h" />

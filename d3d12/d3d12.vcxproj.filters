@@ -81,9 +81,6 @@
     <ClCompile Include="CommandListQueue.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="fbxAnimStack.cpp">
-      <Filter>ソース ファイル\fbx</Filter>
-    </ClCompile>
     <ClCompile Include="AnimPlayer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -210,6 +207,18 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="fbxScene.h">
+      <Filter>ヘッダー ファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="fbxAnimLayer.h">
+      <Filter>ヘッダー ファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="fbxAnimCurveNode.h">
+      <Filter>ヘッダー ファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="fbxAnimCurve.h">
+      <Filter>ヘッダー ファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="fbxSkinCluster.h">
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>
   </ItemGroup>
