@@ -11,6 +11,7 @@ namespace fbx
 	class Model;
 	class AnimStack;
 	class AnimCurve;
+	class Material;
 
 	class Scene : private NonCopyable<Scene>
 	{
@@ -28,6 +29,7 @@ namespace fbx
 		std::unique_ptr<AnimStack> CreateAnimStack(size_t index);
 		std::unique_ptr<AnimCurve> CreateAnimCurve(size_t index);
 		std::vector<std::unique_ptr<Joint>> CreateJoints();
+		std::vector<std::unique_ptr<Material>> CreateMaterials();
 
 	private:
 		FbxScene* pScene_ = nullptr;

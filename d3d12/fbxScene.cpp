@@ -6,6 +6,7 @@
 #include "fbxAnimStack.h"
 #include "fbxAnimCurve.h"
 #include "fbxJoint.h"
+#include "fbxMaterial.h"
 #include <iostream>
 #include <stack>
 #include <queue>
@@ -72,13 +73,13 @@ std::unique_ptr<Model> Scene::CreateModel()
 
 std::unique_ptr<AnimStack> Scene::CreateAnimStack(size_t index)
 {
-	auto pAnimStack = pScene_->GetSrcObject<FbxAnimStack>(index);
+	auto pAnimStack = pScene_->GetSrcObject<FbxAnimStack>(static_cast<int>(index));
 	return std::move(std::make_unique<AnimStack>(pAnimStack));
 }
 
 std::unique_ptr<AnimCurve> Scene::CreateAnimCurve(size_t index)
 {
-	auto pAnimCurve = pScene_->GetSrcObject<FbxAnimCurve>(index);
+	auto pAnimCurve = pScene_->GetSrcObject<FbxAnimCurve>(static_cast<int>(index));
 	return std::move(std::make_unique<AnimCurve>(pAnimCurve));
 }
 
@@ -118,3 +119,17 @@ std::vector<std::unique_ptr<Joint>> Scene::CreateJoints()
 	});
 	return std::move(joints);
 }
+
+std::vector<std::unique_ptr<Material>> Scene::CreateMaterials()
+{
+	std::vector<std::unique_ptr<Material>> materials;
+
+	for (auto i = 0; i < pScene_->GetMaterialCount(); ++i)
+	{
+		auto pMaterial = new Material(pScene_->GetMaterial(i));
+		materials.emplace_back(pMaterial);
+	}
+
+	return std::move(materials);
+}
+
