@@ -25,11 +25,11 @@ namespace fbx
 		size_t AnimStackCount() { return pScene_->GetSrcObjectCount<FbxAnimStack>(); }
 		size_t AnimCurveCount() { return pScene_->GetSrcObjectCount<FbxAnimCurve>(); }
 
-		std::unique_ptr<Model> CreateModel();
-		std::unique_ptr<AnimStack> CreateAnimStack(size_t index);
-		std::unique_ptr<AnimCurve> CreateAnimCurve(size_t index);
-		std::vector<std::unique_ptr<Joint>> CreateJoints();
-		std::vector<std::unique_ptr<Material>> CreateMaterials();
+		std::unique_ptr<Model> LoadModel();
+		std::unique_ptr<AnimStack> LoadAnimStack(size_t index);
+		std::unique_ptr<AnimCurve> LoadAnimCurve(size_t index);
+		std::vector<std::unique_ptr<Joint>> LoadJoints();
+		std::vector<std::unique_ptr<Material>> LoadMaterials();
 
 	private:
 		FbxScene* pScene_ = nullptr;

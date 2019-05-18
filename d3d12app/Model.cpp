@@ -7,10 +7,10 @@ void Model::LoadFromFile(const char* filePath)
 	pScene_ = std::make_unique<fbx::Scene>();
 	pScene_->LoadFromFile(filePath);
 
-	pModel_ = pScene_->CreateModel();
+	pModel_ = pScene_->LoadModel();
 	pModel_->Setup();
 
-	jointPtrs_ = pScene_->CreateJoints();
+	jointPtrs_ = pScene_->LoadJoints();
 	for (auto& pJoint : jointPtrs_)
 	{
 		pJoint->Setup();
@@ -20,7 +20,7 @@ void Model::LoadFromFile(const char* filePath)
 
 void Model::LoadAnim(size_t index)
 {
-	pAnimStack_ = pScene_->CreateAnimStack(index);
+	pAnimStack_ = pScene_->LoadAnimStack(index);
 	pAnimStack_->Setup();
 }
 
