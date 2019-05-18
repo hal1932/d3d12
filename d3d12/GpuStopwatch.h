@@ -10,7 +10,7 @@ public:
 	{
 		HRESULT result;
 
-		D3D12_QUERY_HEAP_DESC heapDesc = { D3D12_QUERY_HEAP_TYPE_TIMESTAMP, static_cast<uint>(count) * 2, 0U };
+		D3D12_QUERY_HEAP_DESC heapDesc = { D3D12_QUERY_HEAP_TYPE_TIMESTAMP, static_cast<UINT>(count) * 2, 0U };
 		result = pDevice->CreateQueryHeap(&heapDesc, IID_PPV_ARGS(&pHeap_));
 		if (FAILED(result))
 		{
@@ -69,7 +69,7 @@ public:
 		void* ptr = nullptr;
 		pResource_->Map(0, &range, &ptr);
 
-		const auto data = reinterpret_cast<ulonglong*>(ptr);
+		const auto data = reinterpret_cast<u64*>(ptr);
 		const auto begin = data[0];
 		const auto end = data[1];
 

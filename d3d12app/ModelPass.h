@@ -59,7 +59,7 @@ private:
 	ShaderManager shaders_;
 	RootSignature rootSignature_;
 
-	std::map<ulonglong, ComPtr<ID3D12PipelineState>> pPipelineStateObjs_;
+	std::map<u64, ComPtr<ID3D12PipelineState>> pPipelineStateObjs_;
 
 	CommandQueue* pRootCommandQueue_;
 	CommandListQueue commandListQueue_;

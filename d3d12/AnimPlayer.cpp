@@ -3,14 +3,6 @@
 #include <algorithm>
 
 
-AnimPlayer::AnimPlayer(AnimCurve* pAnimCurve, float startFrame, float endFrame)
-	: pAnimCurve_(pAnimCurve),
-	startFrame_(startFrame),
-	endFrame_(endFrame),
-	currentFrame_(startFrame)
-{}
-
-
 DirectX::XMMATRIX AnimPlayer::Play()
 {
 	const auto current = CurrentFrame();

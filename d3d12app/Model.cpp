@@ -8,6 +8,20 @@ void Model::LoadFromFile(const char* filePath)
 	pScene_->LoadFromFile(filePath);
 
 	pModel_ = pScene_->CreateModel();
+	pModel_->Setup();
+
+	jointPtrs_ = pScene_->CreateJoints();
+	for (auto& pJoint : jointPtrs_)
+	{
+		pJoint->Setup();
+	}
+}
+
+
+void Model::LoadAnim(size_t index)
+{
+	pAnimStack_ = pScene_->CreateAnimStack(index);
+	pAnimStack_->Setup();
 }
 
 
@@ -30,11 +44,11 @@ void Model::SetupBuffers(ResourceViewHeap* pHeap)
 		pModel_->MeshPtr(i)->SetupBuffers(pHeap);
 	}
 
-	if (pModel_->MeshPtr(0)->MaterialPtr()->TexturePtr() != nullptr)
+	if (pModel_->MeshPtr(0)->MaterialPtr()->TextureCount() > 0)
 	{
 		const SrvDesc srvDesc = {
 			D3D12_SRV_DIMENSION_TEXTURE2D,
-			{ pModel_->MeshPtr(0)->MaterialPtr()->TexturePtr() } };
+			{ pModel_->MeshPtr(0)->MaterialPtr()->TexturePtr(0) } };
 		pTextureSrv_ = pHeap->CreateShaderResourceView(srvDesc);
 	}
 
@@ -48,7 +62,7 @@ UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCmdList, Updat
 }
 
 
-void Model::SetShaderHash(ulonglong hash)
+void Model::SetShaderHash(u64 hash)
 {
 	pModel_->SetShaderHash(hash);
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include "common.h"
-#include "fbxsdk.h"
+#include "fbxObject.h"
+#include <vector>
 #include <Windows.h>
 
 class Device;
@@ -10,18 +10,20 @@ struct UpdateSubresourceContext;
 
 namespace fbx
 {
-	class Material
+	class Material : public Object<FbxSurfaceMaterial>
 	{
 	public:
-		Material();
+		Material(FbxSurfaceMaterial* pSurfaceMaterial);
 		~Material();
 
 		const tstring& Name() { return name_; }
 		const tstring& Name() const { return name_; }
 
-		Texture* TexturePtr() { return pTexture_; }
+		size_t TextureCount() { return pTexturePtrs_->size(); }
+		Texture* TexturePtr(size_t index) { return pTexturePtrs_->at(index); }
 
-		HRESULT UpdateResources(FbxGeometry* pGeom, Device* pDevice);
+		HRESULT Setup();
+		HRESULT UpdateResources(Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
 		Material* CreateReference();
@@ -30,7 +32,7 @@ namespace fbx
 		bool isReference_ = false;
 
 		tstring name_;
-		Texture* pTexture_ = nullptr;
+		std::vector<Texture*>* pTexturePtrs_;
 	};
 
 }// namespace fbx

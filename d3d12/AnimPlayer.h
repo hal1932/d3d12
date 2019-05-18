@@ -1,5 +1,5 @@
 #pragma once
-#include "AnimCurve.h"
+#include "fbxAnimStack.h"
 
 
 enum AnimWrapMode
@@ -13,10 +13,9 @@ enum AnimWrapMode
 class AnimPlayer
 {
 public:
-	AnimPlayer(AnimCurve* pAnimCurve)
-		: AnimPlayer(pAnimCurve, pAnimCurve->StartFrame(), pAnimCurve->EndFrame())
+	AnimPlayer(fbx::AnimStack* pAnimStack)
+		: pAnimStack_(pAnimStack)
 	{}
-	AnimPlayer(AnimCurve* pAnimCurve, float startFrame, float endFrame);
 	~AnimPlayer() = default;
 
 	float StartFrame() { return startFrame_; }
@@ -32,7 +31,7 @@ public:
 	DirectX::XMMATRIX Play();
 
 private:
-	AnimCurve* pAnimCurve_;
+	fbx::AnimStack* pAnimStack_;
 	float startFrame_;
 	float endFrame_;
 	float currentFrame_;

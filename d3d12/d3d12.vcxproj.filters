@@ -81,10 +81,25 @@
     <ClCompile Include="CommandListQueue.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AnimPlayer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="fbxScene.cpp">
+      <Filter>ソース ファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbxJoint.cpp">
+      <Filter>ソース ファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbxSkinCluster.cpp">
+      <Filter>ソース ファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbxAnimLaye.cpp">
+      <Filter>ソース ファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbxAnimStack.cpp">
+      <Filter>ソース ファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbxAnimCurveNode.cpp">
+      <Filter>ソース ファイル\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="fbxAnimCurve.cpp">
       <Filter>ソース ファイル\fbx</Filter>
     </ClCompile>
   </ItemGroup>
@@ -200,9 +215,6 @@
     <ClInclude Include="UniqueArray.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="AnimPlayer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="AnimCurve.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -215,10 +227,16 @@
     <ClInclude Include="fbxAnimCurveNode.h">
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>
+    <ClInclude Include="fbxSkinCluster.h">
+      <Filter>ヘッダー ファイル\fbx</Filter>
+    </ClInclude>
     <ClInclude Include="fbxAnimCurve.h">
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="fbxSkinCluster.h">
+    <ClInclude Include="fbxJoint.h">
+      <Filter>ヘッダー ファイル\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="fbxObject.h">
       <Filter>ヘッダー ファイル\fbx</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,8 +7,7 @@ protected:
 	NonCopyable() = default;
 	~NonCopyable() = default;
 
-private:
-	NonCopyable(const T&) = delete;
-	NonCopyable(T&&) = delete;
-	T& operator=(const T&) = delete;
+	NonCopyable(const NonCopyable&) = delete;
+	NonCopyable(NonCopyable&&) = delete;
+	NonCopyable& operator=(const NonCopyable&) = delete;
 };

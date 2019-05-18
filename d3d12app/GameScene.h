@@ -37,7 +37,7 @@ private:
 	TaskQueue taskQueue_;
 
 	CpuStopwatchBatch cpuTimer_;
-	uint frameIndex_;
+	u64 frameIndex_;
 
 	ModelPass modelPass_;
 };

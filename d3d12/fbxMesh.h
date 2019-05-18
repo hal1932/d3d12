@@ -1,8 +1,8 @@
 #pragma once
-#include "fbxsdk.h"
-#include "Transform.h"
+#include "fbxObject.h"
 #include "ConstantBufferView.h"
 #include "fbxSkinCluster.h"
+#include "NonCopyable.h"
 #include <DirectXMath.h>
 #include <Windows.h>
 
@@ -22,7 +22,7 @@ namespace fbx
 		DirectX::XMMATRIX World;
 	};
 
-	class Mesh
+	class Mesh : public TransformObject<FbxMesh>
 	{
 	public:
 		struct Vertex
@@ -50,6 +50,7 @@ namespace fbx
 		HRESULT UpdateResources(Device* pDevice);
 		UpdateSubresourceContext* UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext);
 
+		HRESULT Setup();
 		HRESULT LoadSkinClusters();
 		size_t SkinClusterCount() { return skinClusterPtrs_.size(); }
 		SkinCluster* SkinClusterPtr(size_t index) { return skinClusterPtrs_[index].get(); }
@@ -64,12 +65,11 @@ namespace fbx
 		void SetTransform(const DirectX::XMMATRIX& t)
 		{
 			TransformConstant cb;
-			cb.World = initialPose_.Matrix() * t;
+			cb.World = PoseMatrix() * t;
 			transformCbv_.CopyBufferFrom(cb);
 		}
 
 	private:
-		FbxMesh* pMesh_;
 		bool isReference_ = false;
 
 		Resource* pVertexBuffer_ = nullptr;
@@ -79,13 +79,11 @@ namespace fbx
 		int* pIndexCount_ = nullptr;
 
 		Material* pMaterial_ = nullptr;
-		Transform initialPose_;
 
 		std::vector<std::unique_ptr<SkinCluster>> skinClusterPtrs_;
 
 		ConstantBufferView<TransformConstant> transformCbv_;
 
-		void Setup_();
 		void UpdateVertexResources_(Device* pDevice);
 		void UpdateIndexResources_(Device* pDevice);
 	};

@@ -1,25 +1,18 @@
 #pragma once
-#include "fbxCommon.h"
+#include "fbxObject.h"
 
 namespace fbx
 {
-	class AnimCurveNode
+	class AnimCurveNode : public Object<FbxAnimCurveNode>
 	{
 	public:
-		AnimCurveNode(FbxAnimCurveNode* pAnimCurveNode) {
-			auto prop = pAnimCurveNode->GetFirstProperty();
-			while (prop.IsValid()) {
-				auto pAnimCurve = prop.GetSrcObject<FbxAnimCurve>();
-				if (pAnimCurve == nullptr) {
-					pAnimCurves_[prop] = pAnimCurve;
-				}
-				prop = pAnimCurveNode->GetNextProperty(prop);
-			}
-		}
-		~AnimCurveNode() {}
+		AnimCurveNode(FbxAnimCurveNode* pAnimCurveNode);
+		~AnimCurveNode() = default;
+
+		HRESULT Setup();
 
 	private:
-		std::map<FbxProperty, FbxAnimCurve*> pAnimCurves_;
+		std::map<FbxProperty, u64> propCurveMap_;
 	};
 
 } // namespace fbx

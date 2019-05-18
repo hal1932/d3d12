@@ -1,24 +1,25 @@
 #pragma once
-#include "fbxCommon.h"
-#include "fbxAnimCurveNode.h"
+#include "fbxObject.h"
 
 namespace fbx
 {
-	class AnimLayer
+	class AnimCurveNode;
+
+	class AnimLayer : public Object<FbxAnimLayer>
 	{
 	public:
-		AnimLayer(FbxAnimLayer* pAnimLayer)
-			: pAnimLayer_(pAnimLayer)
-		{}
-		~AnimLayer() {}
+		AnimLayer(FbxAnimLayer* pAnimLayer);
+		~AnimLayer() = default;
 
-		size_t AnimCurveCount() { return pAnimLayer_->GetMemberCount(); }
-		std::unique_ptr<AnimCurveNode> CreateAnimCurve(size_t index) {
-			return std::make_unique<AnimCurveNode>(pAnimLayer_->GetMember<FbxAnimCurveNode>(static_cast<int>(index)));
-		}
+		HRESULT Setup();
+
+		//size_t AnimCurveCount() { return pAnimLayer_->GetMemberCount(); }
+		//std::unique_ptr<AnimCurveNode> CreateAnimCurveNode(size_t index) {
+		//	return std::make_unique<AnimCurveNode>(pAnimLayer_->GetMember<FbxAnimCurveNode>(static_cast<int>(index)));
+		//}
 
 	private:
-		FbxAnimLayer* pAnimLayer_;
+		std::vector<std::unique_ptr<AnimCurveNode>> animCurveNodePtrs_;
 	};
 
 }// namespace fbx

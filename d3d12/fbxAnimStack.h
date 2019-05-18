@@ -1,27 +1,22 @@
 #pragma once
-#include "common.h"
-#include "fbxCommon.h"
-#include "fbxAnimLayer.h"
-#include "fbxScene.h"
-#include <Windows.h>
-#include <DirectXMath.h>
+#include "fbxObject.h"
 
 namespace fbx
 {
-	class AnimStack
+	class AnimLayer;
+
+	class AnimStack : public Object<FbxAnimStack>
 	{
 	public:
-		AnimStack(Scene* pScene, size_t index) {
-			pAnimStack_ = pScene->NativePtr()->GetSrcObject<FbxAnimStack>(static_cast<int>(index));
-		}
+		AnimStack(FbxAnimStack* pAnimStack);
 		~AnimStack() = default;
 
-		size_t AnimLayerCount() { return pAnimStack_->GetMemberCount(); }
-		std::unique_ptr<AnimLayer> LoadAnimLayer(size_t index) {
-			return std::make_unique<AnimLayer>(pAnimStack_->GetMember<FbxAnimLayer>(static_cast<int>(index)));
-		}
+		LRESULT Setup();
+
+		size_t AnimLayerCount() { return animLayerPtrs_.size(); }
+		AnimLayer* AnimLayerPtr(size_t index) { return animLayerPtrs_[index].get(); }
 
 	private:
-		FbxAnimStack* pAnimStack_;
+		std::vector<std::unique_ptr<AnimLayer>> animLayerPtrs_;
 	};
 }// namespace fbx

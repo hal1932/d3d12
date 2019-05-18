@@ -44,7 +44,7 @@ HRESULT Graphics::ResizeScreen(const ScreenContextDesc& desc)
 	}
 	for (auto pResource : renderTargetHeap_.CreateRenderTargetViewFromBackBuffer(&screen_))
 	{
-		renderTargetPtrs_.push_back(std::unique_ptr<Resource>(pResource));
+		renderTargetPtrs_.emplace_back(pResource);
 	}
 
 	result = depthStencilHeap_.CreateHeap(&device_, { HeapDesc::ViewType::DepthStencilView, 1 });

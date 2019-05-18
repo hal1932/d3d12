@@ -6,50 +6,39 @@
 
 using namespace fbx;
 
-Material::Material() {}
+Material::Material(FbxSurfaceMaterial* pSurfaceMaterial)
+	: Object(pSurfaceMaterial)
+{}
 
 Material::~Material()
 {
 	if (!isReference_)
 	{
-		SafeDelete(&pTexture_);
+		SafeDeleteSequence(pTexturePtrs_);
+		SafeDelete(&pTexturePtrs_);
 	}
 }
 
-HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
+HRESULT Material::Setup()
 {
-	auto pNode = pGeom->GetNode();
-	if (!pNode)
+	auto pMaterial = NativePtr();
+
+	name_ = pMaterial->GetName();
+
+	// とりあえずランバートだけ対応
+	if (pMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId))
 	{
-		return S_FALSE;
+		auto pLambert = static_cast<FbxSurfaceLambert*>(pMaterial);
+		//for (int j = 0; j < 3; ++j)
+		//{
+		//	std::cout << pLambert->Diffuse.Get()[j] << " ";
+		//}
+		//std::cout << std::endl;
 	}
 
-	for (int i = 0; i < pNode->GetMaterialCount(); ++i)
+	// テクスチャ
+	pTexturePtrs_ = new std::vector<Texture*>();
 	{
-		auto pMaterial = pNode->GetMaterial(i);
-
-		//std::cout << pMaterial->GetName() << " " << pMaterial->GetClassId().GetName() << std::endl;
-
-		name_ = pMaterial->GetName();
-
-		// とりあえずランバートだけ対応
-		if (pMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId))
-		{
-			auto pLambert = static_cast<FbxSurfaceLambert*>(pMaterial);
-			//for (int j = 0; j < 3; ++j)
-			//{
-			//	std::cout << pLambert->Diffuse.Get()[j] << " ";
-			//}
-			//std::cout << std::endl;
-		}
-
-		// テクスチャ
-		for (int j = 0; j < pMaterial->GetSrcObjectCount<FbxSurfaceMaterial>(); ++j)
-		{
-			auto pSurfaceMaterial = pMaterial->GetSrcObject<FbxSurfaceMaterial>(j);
-			//std::cout << pSurfaceMaterial->GetName() << std::endl;
-		}
-
 		int layerIndex;
 		FBXSDK_FOR_EACH_TEXTURE(layerIndex)
 		{
@@ -66,15 +55,13 @@ HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
 					size_t n;
 					mbstowcs_s(&n, path, pTexture->GetFileName(), 256);
 
-					pTexture_ = new Texture();
-					if (pTexture_->LoadFromFile(path) == S_OK)
+					auto pTexture = new Texture();
+					if (FAILED(pTexture->LoadFromFile(path)))
 					{
-						pTexture_->UpdateResources(pDevice);
+						SafeDelete(&pTexture);
+						continue;
 					}
-					else
-					{
-						SafeDelete(&pTexture_);
-					}
+					pTexturePtrs_->push_back(pTexture);
 				}
 			}
 		}
@@ -83,22 +70,36 @@ HRESULT Material::UpdateResources(FbxGeometry* pGeom, Device* pDevice)
 	return S_OK;
 }
 
+HRESULT Material::UpdateResources(Device* pDevice)
+{
+	auto pMaterial = NativePtr();
+
+	//std::cout << pMaterial->GetName() << " " << pMaterial->GetClassId().GetName() << std::endl;
+
+	for (auto pTexture : *pTexturePtrs_)
+	{
+		pTexture->UpdateResources(pDevice);
+	}
+
+	return S_OK;
+}
+
 UpdateSubresourceContext* Material::UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext)
 {
-	if (pTexture_ == nullptr)
+	for (auto pTexture : *pTexturePtrs_)
 	{
-		return pContext;
+		pTexture->UpdateSubresource(pCommandList, pContext);
 	}
-	return pTexture_->UpdateSubresource(pCommandList, pContext);
+	return pContext;
 }
 
 Material* Material::CreateReference()
 {
-	auto other = new Material();
+	auto other = new Material(NativePtr());
 	other->isReference_ = true;
 
 	other->name_ = name_;
-	other->pTexture_ = pTexture_;
+	other->pTexturePtrs_ = pTexturePtrs_;
 
 	return other;
 }

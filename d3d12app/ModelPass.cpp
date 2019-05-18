@@ -25,7 +25,7 @@ void ModelPass::SetupGpuResources(Device* pDevice) {}
 void ModelPass::SetupRenderPipeline(Device* pDevice)
 {
 	// シェーダ
-	std::set<ulonglong> modelShaderHashes;
+	std::set<u64> modelShaderHashes;
 	for (auto& model : *pModels_)
 	{
 		const auto shaderHash = shaders_.LoadFromModelMaterial(&model.FbxModel());
@@ -114,7 +114,7 @@ void ModelPass::SetupRenderPipeline(Device* pDevice)
 			pNativeList->SetGraphicsRootSignature(rootSignature_.NativePtr());
 			pNativeList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			ulonglong lastShader = 0ULL;
+			u64 lastShader = 0ULL;
 			for (auto i = start; i < end; ++i)
 			{
 				auto& model = models[i];

@@ -9,8 +9,8 @@ public:
 		: matrix_(DirectX::XMMatrixIdentity())
 	{ }
 
-	DirectX::XMMATRIX& Matrix() { return matrix_; }
-	const DirectX::XMMATRIX& Matrix() const { return matrix_; }
+	DirectX::XMMATRIX& PoseMatrix() { return matrix_; }
+	const DirectX::XMMATRIX& PoseMatrix() const { return matrix_; }
 
 	void SetScaling(float x, float y, float z)
 	{
@@ -79,17 +79,17 @@ public:
 		m.r[3].m128_f32[3] = 1.0f;
 	}
 
-	Transform Clone()
-	{
-		Transform other;
+	//Transform Clone()
+	//{
+	//	Transform other;
 
-		other.matrix_ = matrix_;
-		memcpy(other.scale_, scale_, sizeof(scale_));
-		memcpy(other.rotation_, rotation_, sizeof(rotation_));
-		memcpy(other.translation_, translation_, sizeof(translation_));
+	//	other.matrix_ = matrix_;
+	//	memcpy(other.scale_, scale_, sizeof(scale_));
+	//	memcpy(other.rotation_, rotation_, sizeof(rotation_));
+	//	memcpy(other.translation_, translation_, sizeof(translation_));
 
-		return std::move(other);
-	}
+	//	return std::move(other);
+	//}
 
 private:
 	DirectX::XMMATRIX matrix_;

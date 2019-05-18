@@ -19,7 +19,7 @@ ShaderManager::~ShaderManager()
 	}
 }
 
-ulonglong ShaderManager::LoadFromModelMaterial(fbx::Model* pModel)
+u64 ShaderManager::LoadFromModelMaterial(fbx::Model* pModel)
 {
 	// TODO: エラーハンドリング
 	const auto& name = pModel->MeshPtr(0)->MaterialPtr()->Name();
@@ -62,8 +62,8 @@ ulonglong ShaderManager::LoadFromModelMaterial(fbx::Model* pModel)
 	}
 
 	auto shaderHash = 0UL;
-	shaderHash ^= reinterpret_cast<ulonglong>(pVS);
-	shaderHash ^= reinterpret_cast<ulonglong>(pPS);
+	shaderHash ^= reinterpret_cast<u64>(pVS);
+	shaderHash ^= reinterpret_cast<u64>(pPS);
 	pModel->SetShaderHash(shaderHash);
 
 	names_[shaderHash] = name;

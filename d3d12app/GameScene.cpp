@@ -26,6 +26,7 @@ void GameScene::Setup(Graphics& g)
 		{
 			//model.LoadFromFile("assets/test_anim.fbx");
 			model.LoadFromFile("assets/test_skeletal_anim.fbx");
+			model.LoadAnim(0);
 			model.UpdateResources(pDevice);
 			model.UpdateSubresources(pCommandList.get(), &context);
 			resourceViewCount += model.ResourceBufferCount();
@@ -184,7 +185,7 @@ void GameScene::Draw(Graphics& g, GpuStopwatch* pStopwatch)
 				for (auto j = start; j < end; ++j)
 				{
 					auto& modle = models_[j];
-					cb.World = modle.TransformPtr()->Matrix();
+					cb.World = modle.TransformPtr()->PoseMatrix();
 					modle.SetTransform(cb.World);
 				}
 			});

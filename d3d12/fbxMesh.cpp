@@ -12,7 +12,7 @@ using namespace fbx;
 using namespace fbxsdk;
 
 Mesh::Mesh(FbxMesh* pMesh)
-	: pMesh_(pMesh)
+	: TransformObject(pMesh)
 {}
 
 Mesh::~Mesh()
@@ -29,33 +29,46 @@ Mesh::~Mesh()
 	SafeDelete(&pMaterial_);
 }
 
+HRESULT Mesh::Setup()
+{
+	SafeDelete(&pVertexCount_);
+	pVertexCount_ = new int();
+
+	SafeDelete(&pIndexCount_);
+	pIndexCount_ = new int();
+
+	auto pNode = NativePtr()->GetNode();
+
+	float v[3];
+	toFloat3(v, pNode->LclScaling.Get());
+	SetScaling(v[0], v[1], v[2]);
+
+	toFloat3Radian(v, pNode->LclRotation.Get());
+	SetRotation(v[0], v[1], v[2]);
+
+	toFloat3(v, pNode->LclTranslation.Get());
+	SetTranslation(v[0], v[1], v[2]);
+
+	UpdateMatrix();
+
+	SafeDelete(&pMaterial_);
+	for (auto i = 0; i < pNode->GetMaterialCount(); ++i)
+	{
+		auto pMaterial = pNode->GetMaterial(i);
+		pMaterial_ = new Material(pMaterial);
+		pMaterial_->Setup();
+		break;
+	}
+
+	return S_OK;
+}
+
 HRESULT Mesh::UpdateResources(Device* pDevice)
 {
-	Setup_();
-
 	UpdateVertexResources_(pDevice);
 	UpdateIndexResources_(pDevice);
 
-	{
-		auto pNode = pMesh_->GetNode();
-
-		float v[3];
-		toFloat3(v, pNode->LclScaling.Get());
-		initialPose_.SetScaling(v[0], v[1], v[2]);
-
-		toFloat3Radian(v, pNode->LclRotation.Get());
-		initialPose_.SetRotation(v[0], v[1], v[2]);
-
-		toFloat3(v, pNode->LclTranslation.Get());
-		initialPose_.SetTranslation(v[0], v[1], v[2]);
-
-		initialPose_.UpdateMatrix();
-	}
-
-	SafeDelete(&pMaterial_);
-	pMaterial_ = new Material();
-
-	return pMaterial_->UpdateResources(pMesh_, pDevice);
+	return pMaterial_->UpdateResources(pDevice);
 }
 
 UpdateSubresourceContext* Mesh::UpdateSubresources(CommandList* pCommandList, UpdateSubresourceContext* pContext)
@@ -65,17 +78,18 @@ UpdateSubresourceContext* Mesh::UpdateSubresources(CommandList* pCommandList, Up
 
 HRESULT Mesh::LoadSkinClusters()
 {
-	for (auto i = 0; i < pMesh_->GetDeformerCount(FbxDeformer::EDeformerType::eSkin); ++i)
+	auto pMesh = NativePtr();
+	for (auto i = 0; i < pMesh->GetDeformerCount(FbxDeformer::EDeformerType::eSkin); ++i)
 	{
-		auto pSkin = static_cast<FbxSkin*>(pMesh_->GetDeformer(i, FbxDeformer::EDeformerType::eSkin));
-		skinClusterPtrs_.push_back(std::make_unique<SkinCluster>(pSkin));
+		auto pSkin = static_cast<FbxSkin*>(pMesh->GetDeformer(i, FbxDeformer::EDeformerType::eSkin));
+		skinClusterPtrs_.emplace_back(std::move(std::make_unique<SkinCluster>(pSkin)));
 	}
 	return S_OK;
 }
-
+	
 Mesh* Mesh::CreateReference()
 {
-	auto other = new Mesh(pMesh_);
+	auto other = new Mesh(NativePtr());
 	other->isReference_ = true;
 
 	other->pVertexBuffer_ = pVertexBuffer_;
@@ -85,26 +99,18 @@ Mesh* Mesh::CreateReference()
 	other->pIndexCount_ = pIndexCount_;
 
 	other->pMaterial_ = pMaterial_->CreateReference();
-	other->initialPose_ = initialPose_;
 
 	return other;
 }
 
-void Mesh::Setup_()
-{
-	SafeDelete(&pVertexCount_);
-	pVertexCount_ = new int();
-
-	SafeDelete(&pIndexCount_);
-	pIndexCount_ = new int();
-}
-
 void Mesh::UpdateVertexResources_(Device* pDevice)
 {
+	auto pMesh = NativePtr();
+
 	SafeDelete(&pVertexBuffer_);
 	pVertexBuffer_ = new Resource();
 
-	const auto controlPointCount = pMesh_->GetControlPointsCount();
+	const auto controlPointCount = pMesh->GetControlPointsCount();
 	pVertexBuffer_->CreateVertexBuffer(pDevice, sizeof(Vertex) * controlPointCount);
 
 	{
@@ -112,7 +118,7 @@ void Mesh::UpdateVertexResources_(Device* pDevice)
 
 		// ˆÊ’u
 		{
-			const auto controlPoints = pMesh_->GetControlPoints();
+			const auto controlPoints = pMesh->GetControlPoints();
 
 			for (int i = 0; i < controlPointCount; ++i)
 			{
@@ -130,14 +136,14 @@ void Mesh::UpdateVertexResources_(Device* pDevice)
 		{
 			auto tmpNormalArrays = new std::vector<FbxVector4>[controlPointCount];
 
-			for (int i = 0; i < pMesh_->GetPolygonCount(); ++i)
+			for (int i = 0; i < pMesh->GetPolygonCount(); ++i)
 			{
-				for (int j = 0; j < pMesh_->GetPolygonSize(i); ++j)
+				for (int j = 0; j < pMesh->GetPolygonSize(i); ++j)
 				{
-					const auto dataIndex = pMesh_->GetPolygonVertex(i, j);
+					const auto dataIndex = pMesh->GetPolygonVertex(i, j);
 
 					FbxVector4 normal;
-					if (pMesh_->GetPolygonVertexNormal(i, j, normal))
+					if (pMesh->GetPolygonVertexNormal(i, j, normal))
 					{
 						tmpNormalArrays[dataIndex].push_back(normal);
 					}
@@ -178,15 +184,15 @@ void Mesh::UpdateVertexResources_(Device* pDevice)
 
 		// UV
 		{
-			for (int i = 0; i < pMesh_->GetPolygonCount(); ++i)
+			for (int i = 0; i < pMesh->GetPolygonCount(); ++i)
 			{
-				for (int j = 0; j < pMesh_->GetPolygonSize(i); ++j)
+				for (int j = 0; j < pMesh->GetPolygonSize(i); ++j)
 				{
 					FbxVector2 uv;
 					bool unmapped;
-					if (pMesh_->GetPolygonVertexUV(i, j, "map1", uv, unmapped))
+					if (pMesh->GetPolygonVertexUV(i, j, "map1", uv, unmapped))
 					{
-						const auto dataIndex = pMesh_->GetPolygonVertex(i, j);
+						const auto dataIndex = pMesh->GetPolygonVertex(i, j);
 						auto& tex0 = pData[dataIndex].Texture0;
 
 						tex0.x = static_cast<float>(uv[0]);
@@ -204,19 +210,21 @@ void Mesh::UpdateVertexResources_(Device* pDevice)
 
 void Mesh::UpdateIndexResources_(Device* pDevice)
 {
+	auto pMesh = NativePtr();
+
 	SafeDelete(&pIndexBuffer_);
 	pIndexBuffer_ = new Resource();
 
-	const auto indexCount = pMesh_->GetPolygonVertexCount();
-	pIndexBuffer_->CreateIndexBuffer(pDevice, sizeof(ushort) * indexCount);
+	const auto indexCount = pMesh->GetPolygonVertexCount();
+	pIndexBuffer_->CreateIndexBuffer(pDevice, sizeof(u16) * indexCount);
 
 	{
-		const auto indices = pMesh_->GetPolygonVertices();
-		const auto pData = static_cast<ushort*>(pIndexBuffer_->Map(0));
+		const auto indices = pMesh->GetPolygonVertices();
+		const auto pData = static_cast<u16*>(pIndexBuffer_->Map(0));
 
 		for (int i = 0; i < indexCount; ++i)
 		{
-			pData[i] = static_cast<ushort>(indices[i]);
+			pData[i] = static_cast<u16>(indices[i]);
 		}
 
 		pIndexBuffer_->Unmap(0);

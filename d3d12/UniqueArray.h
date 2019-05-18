@@ -29,9 +29,6 @@ public:
 
 	size_t Size() { return size_; }
 
-	T& At(size_t i) { return this[i]; }
-	const T& At(size_t i) const { return this[i]; }
-
 	void Resize(size_t size) {
 		size_ = size;
 		items_.reset(new T[size + 1]);

@@ -12,8 +12,8 @@
 using namespace fbx;
 using namespace fbxsdk;
 
-Model::Model(Scene* pScene)
-	: pScene_(pScene)
+Model::Model(FbxNode* pNode)
+	: TransformObject(pNode)
 {}
 
 
@@ -23,24 +23,42 @@ Model::~Model()
 }
 
 
-HRESULT Model::UpdateResources(Device* pDevice)
+HRESULT Model::Setup()
 {
 	SafeDeleteSequence(&meshPtrs_);
 
 	auto result = S_OK;
 
 	auto& meshes = meshPtrs_;
-	pScene_->GetFbxNodeRecursive(FbxNodeAttribute::eMesh, [&result, &meshes, pDevice](auto pNode)
+	auto pRootNode = NativePtr();
+	TraverseDepthFirst(pRootNode, FbxNodeAttribute::eMesh, [&result, &meshes](auto pNode)
 	{
 		auto pMesh = new Mesh(pNode->GetMesh());
-		result = pMesh->UpdateResources(pDevice);
-		if (SUCCEEDED(result))
+		result = pMesh->Setup();
+		if (FAILED(result))
 		{
-			meshes.push_back(pMesh);
+			return false;
 		}
 		pMesh->LoadSkinClusters();
+		meshes.push_back(pMesh);
+		return true;
 	});
 
+	return result;
+}
+
+
+HRESULT Model::UpdateResources(Device* pDevice)
+{
+	auto result = S_OK;
+	for (auto& pMesh : meshPtrs_)
+	{
+		result = pMesh->UpdateResources(pDevice);
+		if (FAILED(result))
+		{
+			return result;
+		}
+	}
 	return result;
 }
 
@@ -57,7 +75,7 @@ UpdateSubresourceContext* Model::UpdateSubresources(CommandList* pCommandList, U
 
 Model* Model::CreateReference()
 {
-	auto other = new Model(pScene_);
+	auto other = new Model(NativePtr());
 	other->isReference_ = true;
 
 	other->name_ = name_;

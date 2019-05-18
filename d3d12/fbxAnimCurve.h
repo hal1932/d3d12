@@ -1,16 +1,16 @@
 #pragma once
-#include "fbxCommon.h"
+#include "fbxObject.h"
+#include "fbxAnimCurveKey.h"
 
 namespace fbx
 {
-	class AnimCurve
+	class AnimCurve : public Object<FbxAnimCurve>
 	{
 	public:
-		AnimCurve(FbxAnimCurve* pAnimCurve) : pAnimCurve_(pAnimCurve) {}
-		~AnimCurve() {}
+		AnimCurve(FbxAnimCurve* pAnimCurve);
+		~AnimCurve() = default;
 
-	private:
-		FbxAnimCurve* pAnimCurve_;
+		HRESULT Setup();
 	};
 
 } // namespace fbx
